@@ -11,7 +11,8 @@
 ### 1.1 核心目标
 
 - 📊 **全面记账**：记录每一笔收入与支出
-- 💰 **资产管理**：管理多个账户（现金、银行卡、信用卡、数字钱包等）
+- 💰 **资产管理**：管理多类型资产（现金、银行卡、信用卡、数字货币、贵金属、不动产、车产等）
+- 🌍 **多币种支持**：支持人民币、美元、欧元、日元等多种法币及贵金属
 - 📈 **财务分析**：可视化报表，消费趋势分析
 - 🎯 **预算管理**：设置月度/分类预算，超支提醒
 - 🔒 **数据安全**：本地优先，可选云端同步
@@ -35,8 +36,12 @@
 | 功能 | 说明 |
 |------|------|
 | 账户类型 | 现金、储蓄卡、信用卡、数字货币、投资账户、其他 |
+| 多币种支持 | 支持人民币、美元、欧元、日元等多种法币 |
+| 贵金属账户 | 黄金、白银、铂金等贵金属持仓管理 |
+| 不动产账户 | 房产、土地等不动产估值管理 |
+| 车产账户 | 车辆等动产估值管理 |
 | 账户余额 | 实时更新，支持手动调整 |
-| 多账户转账 | 账户间转账记录 |
+| 多账户转账 | 账户间转账记录（支持币种转换） |
 | 账户分组 | 按类型/用途分组管理 |
 | 账户冻结/归档 | 不活跃账户隐藏 |
 
@@ -125,6 +130,18 @@
 ```
 id, name, type, currency, balance, icon, color, 
 is_active, created_at, updated_at, notes
+
+# 账户类型 (type):
+# - cash: 现金
+# - bank: 储蓄卡
+# - credit_card: 信用卡
+# - digital_wallet: 数字钱包（微信/支付宝等）
+# - investment: 投资账户（股票/基金）
+# - crypto: 数字货币
+# - precious_metal: 贵金属（黄金/白银/铂金）
+# - real_estate: 不动产（房产/土地）
+# - vehicle: 车产
+# - other: 其他
 ```
 
 #### Transaction（交易记录）
@@ -167,7 +184,7 @@ deadline, icon, created_at, updated_at
 | 层级 | 技术 | 说明 |
 |------|------|------|
 | **前端** | Vue 3 + TypeScript + Vite | 主框架 |
-| **移动端** | UniApp / Taro | 跨平台（可选） |
+| **移动端** | UniApp (Vue 语法) | iOS + Android + 小程序 |
 | **UI 组件** | Element Plus / Naive UI | 桌面端 |
 | **状态管理** | Pinia | 数据状态 |
 | **后端** | Python + FastAPI | API 服务 |
@@ -254,7 +271,14 @@ my-wallet-butler/
 │   ├── index.html
 │   ├── vite.config.ts
 │   └── package.json
-├── mobile/                 # 移动端（可选）
+├── mobile/                 # 移动端 (UniApp - Vue 语法)
+│   ├── pages/              # 页面
+│   ├── components/         # 组件
+│   ├── static/             # 静态资源
+│   ├── uni.scss            # 全局样式
+│   ├── pages.json          # 页面配置
+│   ├── manifest.json       # 应用配置
+│   └── App.vue
 ├── docker/                 # Docker 配置
 ├── .env.example            # 环境变量示例
 ├── docker-compose.yml      # Docker Compose
@@ -431,11 +455,12 @@ npm install -D unplugin-auto-import unplugin-vue-components
 
 | 事项 | 选项 | 状态 |
 |------|------|------|
-| 数据库选型 | SQLite（单机）vs PostgreSQL（多用户） | 待决策 |
-| 部署方式 | 本地 Docker 部署 | 已决策 |
-| 移动端方案 | UniApp vs Taro vs 不做 | 待决策 |
-| 是否支持多币种 | 是 vs 否 | 待决策 |
-| 是否需要社交功能 | 家庭共享 vs 纯个人 | 待决策 |
+| 数据库选型 | MySQL 8.x | ✅ 已决策 |
+| 部署方式 | 本地 Docker 部署 | ✅ 已决策 |
+| 移动端方案 | UniApp | ✅ 已决策 |
+| 是否支持多币种 | ✅ 支持 | ✅ 已决策 |
+| 资产类型 | 现金、银行卡、信用卡、数字货币、贵金属、不动产、车产 | ✅ 已决策 |
+| 社交功能 | ❌ 不需要，纯个人使用 | ✅ 已决策 |
 
 ---
 
