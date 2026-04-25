@@ -1,0 +1,71 @@
+// 全局样式
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: $text-color-regular;
+  background-color: $main-bg-color;
+}
+
+a {
+  text-decoration: none;
+  color: $primary-color;
+}
+
+a:hover {
+  color: lighten($primary-color, 10%);
+}
+
+// Element Plus 自定义样式
+.el-card {
+  margin-bottom: 20px;
+}
+
+.el-table {
+  margin-top: 20px;
+}
+
+// 响应式布局
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+
+  .el-col-xs-24 {
+    width: 100%;
+    display: block;
+  }
+}
+
+// 工具类
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.pull-left {
+  float: left;
+}
+
+.pull-right {
+  float: right;
+}
+
+.clearfix::after {
+  display: block;
+  clear: both;
+  content: "";
+}
