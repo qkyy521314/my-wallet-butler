@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { login, register, getUserInfo, logout } from '@/api/auth'
+import { login, register, getUserInfo, updateUserProfile, logout } from '@/api/auth'
 
 interface UserState {
   user: any | null
@@ -18,7 +18,8 @@ export const useUserStore = defineStore('user', {
     async login(credentials: { username: string, password: string }) {
       try {
         const response = await login(credentials)
-        const { access_token } = response.data
+        const { data } = response.data  // Now the token is in response.data.data
+        const { access_token } = data
 
         this.token = access_token
         this.isAuthenticated = true
@@ -43,11 +44,24 @@ export const useUserStore = defineStore('user', {
     async fetchUserInfo() {
       try {
         const response = await getUserInfo()
-        this.user = response.data
+        // Now the user data is in response.data.data
+        this.user = response.data.data
         return response
       } catch (error) {
         console.error('Failed to fetch user info:', error)
         this.logout()
+        throw error
+      }
+    },
+
+    async updateProfile(userData: { username?: string, email?: string, first_name?: string, last_name?: string }) {
+      try {
+        const response = await updateUserProfile(userData)
+        // Update the user info in the store
+        this.user = response.data.data
+        return response
+      } catch (error) {
+        console.error('Failed to update profile:', error)
         throw error
       }
     },

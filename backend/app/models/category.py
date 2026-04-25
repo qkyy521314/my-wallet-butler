@@ -13,16 +13,13 @@ class Category(Base):
     description = Column(String(255))
     is_active = Column(Boolean, default=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    parent_id = Column(Integer, ForeignKey("categories.id"), nullable=True)  # For hierarchical categories
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    # Relationship
+    # Relationships
     user = relationship("User", back_populates="categories")
+    parent = relationship("Category", remote_side=[id], backref="children")
 
     def __repr__(self):
         return f"<Category(id={self.id}, name='{self.name}', type='{self.category_type}')>"
-
-
-# 在 User 模型中添加反向关系
-if not hasattr(User, 'categories'):
-    User.categories = relationship("Category", back_populates="user", lazy="select")

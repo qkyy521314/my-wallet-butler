@@ -12,10 +12,10 @@ class Transaction(Base):
     description = Column(String(255))
     transaction_type = Column(String(20), nullable=False)  # income, expense, transfer
     category_id = Column(Integer, ForeignKey("categories.id"))
-    account_id = Column(Integer, ForeignKey("accounts.id"), nullable=False)
-    from_account_id = Column(Integer, ForeignKey("accounts.id"))  # For transfers
-    to_account_id = Column(Integer, ForeignKey("accounts.id"))    # For transfers
-    date = Column(DateTime(timezone=True), nullable=False)
+    account_id = Column(Integer, ForeignKey("accounts.id"))  # 主账户（对于转账来说是目标账户）
+    from_account_id = Column(Integer, ForeignKey("accounts.id"))  # 转出账户（仅用于转账）
+    to_account_id = Column(Integer, ForeignKey("accounts.id"))    # 转入账户（仅用于转账）
+    date = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     is_active = Column(Boolean, default=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -30,8 +30,3 @@ class Transaction(Base):
 
     def __repr__(self):
         return f"<Transaction(id={self.id}, amount={self.amount}, type='{self.transaction_type}')>"
-
-
-# 在 User 模型中添加反向关系
-if not hasattr(User, 'transactions'):
-    User.transactions = relationship("Transaction", back_populates="user", lazy="select")

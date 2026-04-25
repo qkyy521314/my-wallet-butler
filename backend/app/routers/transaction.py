@@ -1,59 +1,138 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
+from typing import List, Optional
 from ..database import get_db
-from .. import schemas, crud
+from .. import schemas, crud, models
 from ..utils.exceptions import InsufficientPermissions
+from ..services.auth import get_current_user
+from ..schemas.common import SuccessResponse, PaginatedResponse
+from sqlalchemy import func
+from pydantic import BaseModel
+
+
+class TransferRequest(BaseModel):
+    from_account_id: int
+    to_account_id: int
+    amount: float
+    description: Optional[str] = ""
+    category_id: Optional[int] = None
+    date: Optional[str] = None
+    is_active: Optional[bool] = True
+
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.Transaction])
+@router.get("/")
 async def get_transactions(
     db: AsyncSession = Depends(get_db),
-    skip: int = 0,
-    limit: int = 100
+    current_user: models.User = Depends(get_current_user),
+    page: int = Query(1, ge=1),
+    size: int = Query(20, ge=1, le=100),
+    transaction_type: Optional[str] = Query(None),
+    is_active: Optional[bool] = Query(True),
+    account_id: Optional[int] = Query(None),
+    category_id: Optional[int] = Query(None),
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None)
 ):
-    transactions = await crud.transaction.get_multi(db, skip=skip, limit=limit)
-    return transactions
+    skip = (page - 1) * size
+
+    transactions, total = await crud.transaction.get_multi(
+        db,
+        skip=skip,
+        limit=size,
+        user_id=current_user.id,
+        transaction_type=transaction_type,
+        is_active=is_active,
+        account_id=account_id,
+        category_id=category_id,
+        start_date=start_date,
+        end_date=end_date
+    )
+
+    total_pages = (total + size - 1) // size  # 向上取整
+
+    paginated_data = {
+        "items": transactions,
+        "total": total,
+        "page": page,
+        "size": size,
+        "total_pages": total_pages
+    }
+
+    return SuccessResponse(code=200, message="Transactions retrieved successfully", data=paginated_data)
 
 
-@router.get("/{transaction_id}", response_model=schemas.Transaction)
-async def get_transaction(transaction_id: int, db: AsyncSession = Depends(get_db)):
-    transaction = await crud.transaction.get(db, transaction_id)
+@router.get("/{transaction_id}")
+async def get_transaction(
+    transaction_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    transaction = await crud.transaction.get(db, transaction_id, user_id=current_user.id)
     if not transaction:
-        raise HTTPException(status_code=404, detail="Transaction not found")
-    return transaction
+        raise HTTPException(status_code=404, detail="Transaction not found or insufficient permissions")
+    return SuccessResponse(code=200, message="Transaction retrieved successfully", data=transaction)
 
 
-@router.post("/", response_model=schemas.Transaction)
+@router.post("/")
 async def create_transaction(
     transaction: schemas.TransactionCreate,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
 ):
-    db_transaction = await crud.transaction.create(db, transaction)
-    return db_transaction
+    db_transaction = await crud.transaction.create(db, transaction, user_id=current_user.id)
+    return SuccessResponse(code=200, message="Transaction created successfully", data=db_transaction)
 
 
-@router.put("/{transaction_id}", response_model=schemas.Transaction)
+@router.put("/{transaction_id}")
 async def update_transaction(
     transaction_id: int,
     transaction_update: schemas.TransactionUpdate,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
 ):
-    db_transaction = await crud.transaction.get(db, transaction_id)
+    db_transaction = await crud.transaction.get(db, transaction_id, user_id=current_user.id)
     if not db_transaction:
-        raise HTTPException(status_code=404, detail="Transaction not found")
+        raise HTTPException(status_code=404, detail="Transaction not found or insufficient permissions")
 
-    updated_transaction = await crud.transaction.update(db, db_transaction, transaction_update)
-    return updated_transaction
+    updated_transaction = await crud.transaction.update(db, db_obj=db_transaction, obj_in=transaction_update)
+    return SuccessResponse(code=200, message="Transaction updated successfully", data=updated_transaction)
 
 
 @router.delete("/{transaction_id}")
-async def delete_transaction(transaction_id: int, db: AsyncSession = Depends(get_db)):
-    transaction = await crud.transaction.get(db, transaction_id)
+async def delete_transaction(
+    transaction_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    transaction = await crud.transaction.get(db, transaction_id, user_id=current_user.id)
     if not transaction:
-        raise HTTPException(status_code=404, detail="Transaction not found")
+        raise HTTPException(status_code=404, detail="Transaction not found or insufficient permissions")
 
-    await crud.transaction.remove(db, transaction)
-    return {"success": True, "message": "Transaction deleted successfully"}
+    await crud.transaction.remove(db, transaction_id, user_id=current_user.id)
+    return SuccessResponse(code=200, message="Transaction deleted successfully", data=None)
+
+
+@router.post("/transfer/")
+async def create_transfer(
+    transfer_request: TransferRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    try:
+        transfer_data = {
+            'from_account_id': transfer_request.from_account_id,
+            'to_account_id': transfer_request.to_account_id,
+            'amount': transfer_request.amount,
+            'description': transfer_request.description,
+            'category_id': transfer_request.category_id,
+            'date': transfer_request.date,
+            'is_active': transfer_request.is_active
+        }
+
+        transfer = await crud.transaction.create_transfer(db, transfer_data, current_user.id)
+        return SuccessResponse(code=200, message="Transfer completed successfully", data=transfer)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

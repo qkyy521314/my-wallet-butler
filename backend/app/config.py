@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     # JWT 配置
     SECRET_KEY: str = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
     ALGORITHM: str = os.getenv("ALGORITHM", "HS256")
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 10080))  # 7 days (7 * 24 * 60)
 
     # 应用配置
     APP_NAME: str = os.getenv("APP_NAME", "My Wallet Butler")

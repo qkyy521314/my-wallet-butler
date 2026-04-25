@@ -7,11 +7,8 @@ T = TypeVar('T')
 
 
 class SuccessResponse(BaseModel):
-    success: bool = True
-    message: Optional[str] = None
-
-
-class SuccessResponseWithData(SuccessResponse):
+    code: int = 200
+    message: str = "success"
     data: Optional[T] = None
 
     class Config:

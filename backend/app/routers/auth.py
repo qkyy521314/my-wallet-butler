@@ -3,12 +3,14 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..database import get_db
 from .. import schemas, crud, models, utils
-from ..services.auth import create_access_token, authenticate_user
+from ..services.auth import create_access_token, authenticate_user, get_current_user
+from ..schemas.common import SuccessResponse
+
 
 router = APIRouter()
 
 
-@router.post("/register", response_model=schemas.User)
+@router.post("/register", response_model=SuccessResponse)
 async def register_user(user: schemas.UserCreate, db: AsyncSession = Depends(get_db)):
     # 检查用户名或邮箱是否已存在
     existing_user = await crud.user.get_by_username_or_email(db, user.username, user.email)
@@ -21,10 +23,10 @@ async def register_user(user: schemas.UserCreate, db: AsyncSession = Depends(get
     # 创建新用户
     user.hashed_password = utils.security.get_password_hash(user.password)
     db_user = await crud.user.create(db, user)
-    return db_user
+    return SuccessResponse(code=200, message="User registered successfully", data=db_user)
 
 
-@router.post("/login", response_model=schemas.Token)
+@router.post("/login", response_model=SuccessResponse)
 async def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
     user = await authenticate_user(db, form_data.username, form_data.password)
     if not user:
@@ -35,4 +37,26 @@ async def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Async
         )
 
     access_token = create_access_token(data={"sub": user.username})
-    return {"access_token": access_token, "token_type": "bearer"}
+    token_data = {"access_token": access_token, "token_type": "bearer"}
+    return SuccessResponse(code=200, message="Login successful", data=token_data)
+
+
+@router.get("/me", response_model=SuccessResponse)
+async def read_users_me(current_user: models.User = Depends(get_current_user)):
+    """
+    获取当前用户信息
+    """
+    return SuccessResponse(code=200, message="User information retrieved", data=current_user)
+
+
+@router.put("/profile", response_model=SuccessResponse)
+async def update_profile(
+    user_update: schemas.UserUpdate,
+    current_user: models.User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    更新用户个人信息
+    """
+    updated_user = await crud.user.update(db, db_obj=current_user, obj_in=user_update)
+    return SuccessResponse(code=200, message="Profile updated successfully", data=updated_user)
