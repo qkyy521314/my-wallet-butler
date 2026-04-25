@@ -22,12 +22,23 @@
               :status="getProgressStatus(scope.row.spent_amount, scope.row.amount)"
               :color="getProgressColor(scope.row.spent_amount, scope.row.amount)"
             />
+            <div>{{ calculateProgress(scope.row.spent_amount, scope.row.amount) }}%</div>
+          </template>
+        </el-table-column>
+        <el-table-column label="状态" width="120">
+          <template #default="scope">
+            <el-tag
+              :type="scope.row.is_over_spent ? 'danger' : calculateProgress(scope.row.spent_amount, scope.row.amount) >= 80 ? 'warning' : 'success'"
+            >
+              {{ scope.row.is_over_spent ? '超支' : calculateProgress(scope.row.spent_amount, scope.row.amount) >= 80 ? '警戒' : '正常' }}
+            </el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="description" label="描述" />
         <el-table-column label="操作" width="200">
           <template #default="scope">
             <el-button size="small" @click="showEditDialog(scope.row)">编辑</el-button>
+            <el-button size="small" type="info" @click="viewStats(scope.row.id)">统计</el-button>
             <el-button size="small" type="danger" @click="deleteBudget(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
@@ -88,21 +99,43 @@
           </span>
         </template>
       </el-dialog>
+
+      <!-- 预算统计对话框 -->
+      <el-dialog v-model="statsDialogVisible" title="预算统计详情" width="600px">
+        <div v-if="selectedStats">
+          <el-descriptions :column="1" border>
+            <el-descriptions-item label="预算名称">{{ selectedStats.name }}</el-description-item>
+            <el-descriptions-item label="总预算金额">{{ amountFormatter(null, null, selectedStats.total_amount) }}</el-descriptions-item>
+            <el-descriptions-item label="已花费">{{ amountFormatter(null, null, selectedStats.spent_amount) }}</el-descriptions-item>
+            <el-descriptions-item label="剩余预算">{{ amountFormatter(null, null, selectedStats.remaining_amount) }}</el-descriptions-item>
+            <el-descriptions-item label="花费百分比">{{ selectedStats.spent_percentage }}%</el-descriptions-item>
+            <el-descriptions-item label="状态">
+              <el-tag
+                :type="selectedStats.is_over_spent ? 'danger' : selectedStats.spent_percentage >= 80 ? 'warning' : 'success'"
+              >
+                {{ selectedStats.is_over_spent ? '超支' : selectedStats.spent_percentage >= 80 ? '警戒' : '正常' }}
+              </el-tag>
+            </el-descriptions-item>
+          </el-descriptions>
+        </div>
+      </el-dialog>
     </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
-import { getBudgets, createBudget, updateBudget, deleteBudget as deleteApiBudget } from '@/api/budget'
+import { getBudgets, createBudget, updateBudget, deleteBudget as deleteApiBudget, getBudgetStats } from '@/api/budget'
 import { getCategories } from '@/api/category'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 
 // 定义响应式数据
 const budgets = ref([])
 const categories = ref([])
 const loading = ref(true)
 const dialogVisible = ref(false)
+const statsDialogVisible = ref(false)
+const selectedStats = ref(null)
 const isEdit = ref(false)
 const budgetForm = reactive({
   id: undefined,
@@ -140,7 +173,7 @@ const dialogTitle = ref('新增预算')
 
 // 金额格式化函数
 const amountFormatter = (row: any, column: any, cellValue: any) => {
-  return `¥ ${parseFloat(cellValue).toFixed(2)}`
+  return `¥ ${parseFloat(cellValue || 0).toFixed(2)}`
 }
 
 // 日期格式化函数
@@ -150,7 +183,10 @@ const dateFormatter = (row: any, column: any, cellValue: any) => {
 
 // 计算预算进度百分比
 const calculateProgress = (spent: number, total: number) => {
-  return Math.round((parseFloat(spent) / parseFloat(total)) * 100)
+  const spentNum = parseFloat(spent || 0)
+  const totalNum = parseFloat(total || 0)
+  if (totalNum === 0) return 0
+  return Math.round((spentNum / totalNum) * 100)
 }
 
 // 根据进度返回状态
@@ -262,6 +298,18 @@ const deleteBudget = async (id: number) => {
       console.error('Delete error:', error)
       ElMessage.error('删除失败')
     }
+  }
+}
+
+// 查看预算统计
+const viewStats = async (id: number) => {
+  try {
+    const response = await getBudgetStats(id)
+    selectedStats.value = response.data
+    statsDialogVisible.value = true
+  } catch (error) {
+    console.error('Failed to load budget stats:', error)
+    ElMessage.error('加载预算统计失败')
   }
 }
 

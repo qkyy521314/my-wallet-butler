@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import auth, account, category, transaction, tag, budget, report
+from .routers import auth, account, category, transaction, tag, budget, report, import_transactions
 
 app = FastAPI(title="My Wallet Butler API", version="1.0.0")
 
@@ -21,6 +21,7 @@ app.include_router(transaction.router, prefix="/api/v1", tags=["transaction"])
 app.include_router(tag.router, prefix="/api/v1", tags=["tag"])
 app.include_router(budget.router, prefix="/api/v1", tags=["budget"])
 app.include_router(report.router, prefix="/api/v1", tags=["report"])
+app.include_router(import_transactions.router, prefix="/api/v1", tags=["import"])
 
 @app.get("/")
 async def root():

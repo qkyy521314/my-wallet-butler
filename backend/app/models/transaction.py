@@ -27,6 +27,7 @@ class Transaction(Base):
     account = relationship("Account", foreign_keys=[account_id])
     from_account = relationship("Account", foreign_keys=[from_account_id])
     to_account = relationship("Account", foreign_keys=[to_account_id])
+    tags = relationship("Tag", secondary="transaction_tags", back_populates="transactions")
 
     def __repr__(self):
         return f"<Transaction(id={self.id}, amount={self.amount}, type='{self.transaction_type}')>"

@@ -1,8 +1,8 @@
 from typing import Any, Dict, List, Optional, Union
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from .models.tag import Tag
-from .schemas.tag import TagCreate, TagUpdate
+from ..models.tag import Tag
+from ..schemas.tag import TagCreate, TagUpdate
 
 
 class CRUDTag:

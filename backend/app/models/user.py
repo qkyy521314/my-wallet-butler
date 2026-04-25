@@ -22,6 +22,8 @@ class User(Base):
     accounts = relationship("Account", back_populates="user", lazy="select")
     categories = relationship("Category", back_populates="user", lazy="select")
     transactions = relationship("Transaction", back_populates="user", lazy="select")
+    tags = relationship("Tag", back_populates="user", lazy="select")
+    budgets = relationship("Budget", back_populates="user", lazy="select")
 
     def __repr__(self):
         return f"<User(id={self.id}, username='{self.username}', email='{self.email}')>"

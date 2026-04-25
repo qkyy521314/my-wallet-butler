@@ -55,5 +55,90 @@ async def delete_tag(tag_id: int, db: AsyncSession = Depends(get_db)):
     if not tag:
         raise HTTPException(status_code=404, detail="Tag not found")
 
-    await crud.tag.remove(db, tag)
+    await crud.tag.remove(db, tag_id)
     return {"success": True, "message": "Tag deleted successfully"}
+
+
+@router.get("/{tag_id}/transactions", response_model=List[schemas.Transaction])
+async def get_transactions_by_tag(
+    tag_id: int,
+    db: AsyncSession = Depends(get_db),
+    skip: int = 0,
+    limit: int = 100
+):
+    """获取带有指定标签的交易列表"""
+    from ..models.transaction import Transaction
+    from sqlalchemy import select, and_
+    from sqlalchemy.orm import selectinload
+
+    # 先检查标签是否存在
+    tag = await crud.tag.get(db, tag_id)
+    if not tag:
+        raise HTTPException(status_code=404, detail="Tag not found")
+
+    # 需要先将 Transaction 导入
+    from ..models.transaction_tag import TransactionTag
+
+    # 查询带有所选标签的交易
+    result = await db.execute(
+        select(Transaction)
+        .join(TransactionTag)
+        .where(and_(TransactionTag.tag_id == tag_id, Transaction.user_id == tag.user_id))  # 确保权限控制
+        .offset(skip)
+        .limit(limit)
+    )
+    return result.scalars().all()
+
+
+@router.post("/{transaction_id}/tags/{tag_id}")
+async def add_tag_to_transaction(
+    transaction_id: int,
+    tag_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    """为交易添加标签"""
+    # 检查交易和标签是否存在
+    from ..models.transaction import Transaction
+    transaction = await crud.transaction.get(db, transaction_id)
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+
+    tag = await crud.tag.get(db, tag_id)
+    if not tag:
+        raise HTTPException(status_code=404, detail="Tag not found")
+
+    # 检查用户权限
+    if transaction.user_id != tag.user_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    # 创建关联
+    await crud.transaction_tag.create(db, transaction_id, tag_id)
+    return {"success": True, "message": "Tag added to transaction successfully"}
+
+
+@router.delete("/{transaction_id}/tags/{tag_id}")
+async def remove_tag_from_transaction(
+    transaction_id: int,
+    tag_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    """从交易移除标签"""
+    # 检查交易和标签是否存在
+    from ..models.transaction import Transaction
+    transaction = await crud.transaction.get(db, transaction_id)
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+
+    tag = await crud.tag.get(db, tag_id)
+    if not tag:
+        raise HTTPException(status_code=404, detail="Tag not found")
+
+    # 检查用户权限
+    if transaction.user_id != tag.user_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    success = await crud.transaction_tag.remove_by_transaction_and_tag(db, transaction_id, tag_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Tag association not found")
+
+    return {"success": True, "message": "Tag removed from transaction successfully"}

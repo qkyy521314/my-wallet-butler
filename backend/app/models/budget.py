@@ -16,6 +16,7 @@ class Budget(Base):
     spent_amount = Column(Numeric(10, 2), default=0.00)
     description = Column(String(255))
     is_active = Column(Boolean, default=True)
+    is_over_spent = Column(Boolean, default=False)  # 是否超支
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -27,7 +28,14 @@ class Budget(Base):
     def __repr__(self):
         return f"<Budget(id={self.id}, name='{self.name}', amount={self.amount})>"
 
+    @property
+    def spent_percentage(self):
+        """计算预算执行百分比"""
+        if self.amount == 0:
+            return 0
+        return round((self.spent_amount / self.amount) * 100, 2)
 
-# 在 User 模型中添加反向关系
-if not hasattr(User, 'budgets'):
-    User.budgets = relationship("Budget", back_populates="user", lazy="select")
+    @property
+    def is_exceeded(self):
+        """判断是否超支"""
+        return self.spent_amount > self.amount

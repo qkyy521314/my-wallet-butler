@@ -16,13 +16,9 @@ class Tag(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    # Relationship
+    # Relationships
     user = relationship("User", back_populates="tags")
+    transactions = relationship("Transaction", secondary="transaction_tags", back_populates="tags")
 
     def __repr__(self):
         return f"<Tag(id={self.id}, name='{self.name}', color='{self.color}')>"
-
-
-# 在 User 模型中添加反向关系
-if not hasattr(User, 'tags'):
-    User.tags = relationship("Tag", back_populates="user", lazy="select")

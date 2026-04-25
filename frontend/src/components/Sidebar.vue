@@ -35,6 +35,11 @@
         <el-icon><PieChart /></el-icon>
         <span>报表分析</span>
       </el-menu-item>
+
+      <el-menu-item index="/import">
+        <el-icon><Upload /></el-icon>
+        <span>批量导入</span>
+      </el-menu-item>
     </el-menu>
   </div>
 </template>
@@ -48,7 +53,8 @@ import {
   FolderOpened,
   Tickets,
   Money,
-  PieChart
+  PieChart,
+  Upload
 } from '@element-plus/icons-vue'
 
 const route = useRoute()
@@ -62,6 +68,7 @@ const activeMenu = computed(() => {
   if (path.startsWith('/transactions')) return '/transactions'
   if (path.startsWith('/budgets')) return '/budgets'
   if (path.startsWith('/reports')) return '/reports'
+  if (path.startsWith('/import')) return '/import'
   return '/dashboard'
 })
 </script>

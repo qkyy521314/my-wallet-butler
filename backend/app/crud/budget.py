@@ -1,8 +1,11 @@
 from typing import Any, Dict, List, Optional, Union
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from .models.budget import Budget
-from .schemas.budget import BudgetCreate, BudgetUpdate
+from sqlalchemy import func, and_
+from datetime import datetime
+from ..models.budget import Budget
+from ..models.transaction import Transaction
+from ..schemas.budget import BudgetCreate, BudgetUpdate
 
 
 class CRUDBudget:
@@ -56,6 +59,56 @@ class CRUDBudget:
             await db.delete(obj)
             await db.commit()
         return obj
+
+    async def get_monthly_budgets(self, db: AsyncSession, user_id: int, year: int, month: int) -> List[Budget]:
+        """获取指定用户和月份的预算"""
+        from datetime import datetime
+        from sqlalchemy import extract
+
+        result = await db.execute(
+            select(Budget).where(
+                and_(
+                    Budget.user_id == user_id,
+                    extract('year', Budget.period_start) == year,
+                    extract('month', Budget.period_start) <= month,
+                    extract('year', Budget.period_end) == year,
+                    extract('month', Budget.period_end) >= month,
+                    Budget.is_active == True
+                )
+            )
+        )
+        return result.scalars().all()
+
+    async def calculate_category_spending(self, db: AsyncSession, user_id: int, category_id: int, start_date: datetime, end_date: datetime) -> float:
+        """计算指定分类在指定时间段内的支出"""
+        result = await db.execute(
+            select(func.sum(Transaction.amount)).where(
+                and_(
+                    Transaction.user_id == user_id,
+                    Transaction.category_id == category_id,
+                    Transaction.transaction_type == 'expense',
+                    Transaction.date >= start_date,
+                    Transaction.date <= end_date,
+                    Transaction.is_active == True
+                )
+            )
+        )
+        spending = result.scalar()
+        return spending if spending is not None else 0.0
+
+    async def update_budget_spent_amount(self, db: AsyncSession, budget_id: int) -> Budget:
+        """更新预算的已花费金额"""
+        budget = await self.get(db, budget_id)
+        if budget:
+            spent = await self.calculate_category_spending(
+                db, budget.user_id, budget.category_id, budget.period_start, budget.period_end
+            )
+            budget.spent_amount = spent
+            budget.is_over_spent = spent > budget.amount
+            db.add(budget)
+            await db.commit()
+            await db.refresh(budget)
+        return budget
 
 
 budget = CRUDBudget()
