@@ -47,34 +47,34 @@
 
 ## Phase 5 - 报表统计与数据备份 ✅ 已完成
 - [x] 报表生成
-  - [x] 月度收支统计（/report/summary）
-  - [x] 分类支出占比分析（/report/category-analysis）
-  - [x] 收支趋势分析（/report/trend-analysis，支持按天/周/月分组）
-  - [x] 月度报表汇总（/report/monthly-report）
-  - [x] 预算执行报告（/report/budget-performance）
+  - [x] 月度收支统计（GET /report/monthly-summary）
+  - [x] 分类支出占比分析（GET /report/category-expense）
+  - [x] 每日收支趋势（GET /report/daily-trend）
+  - [x] 年度收支汇总（GET /report/yearly-summary）
+  - [x] 预算执行报告（GET /report/budget-execution）
 - [x] 数据可视化
-  - [x] 饼图 - 分类支出/收入占比（ECharts）
-  - [x] 折线图 - 收支趋势（ECharts，支持按天/周/月）
-  - [x] 快速日期选择（本月/本季度/本年度）
-  - [x] 月度报表详情表格
+  - [x] 每日收支柱状图（ECharts）
+  - [x] 分类支出占比饼图（ECharts）
+  - [x] 预算执行进度条（Element Plus Progress）
+  - [x] 月度汇总卡片（总收入/总支出/净收支）
 - [x] 数据导出
-  - [x] CSV 导出（/report/export/csv）
-  - [x] Excel 导出（/report/export/excel，含格式化样式）
-  - [x] 前端导出按钮
+  - [x] CSV 导出（GET /report/export/csv，UTF-8 BOM）
+  - [x] Excel 导出（GET /report/export/excel，openpyxl，自动列宽）
+  - [x] 前端导出下拉按钮（Report.vue）
 - [x] 数据备份
-  - [x] 创建备份（/report/backup，JSON 格式）
-  - [x] 备份列表（/report/backup/list）
-  - [x] 下载备份（/report/backup/download/{filename}）
-  - [x] 删除备份（/report/backup/delete/{filename}）
+  - [x] 创建备份（POST /report/backup，mysqldump）
+  - [x] 备份列表（GET /report/backups）
+  - [x] 删除备份（DELETE /report/backups/{filename}，含路径遍历防护）
+  - [x] 备份管理页面（Backup.vue）
 - [x] 数据恢复
-  - [x] 从已有备份恢复（/report/restore，支持合并/替换模式）
-  - [x] 从上传文件恢复（/report/restore/upload）
-  - [x] ID 映射（恢复时自动映射旧 ID 到新 ID）
-- [x] 修复 MySQL 兼容性（to_char → DATE_FORMAT）
-- [x] 修复前端 user_id 硬编码问题（使用 Pinia store）
-- [x] 添加 ECharts 依赖
+  - [x] 从备份恢复（POST /report/restore，mysql 命令行）
+  - [x] 恢复确认对话框（ElMessageBox 二次确认）
+- [x] 修复 MySQL 兼容性（report.py: to_char → DATE_FORMAT）
+- [x] 修复前端 user_id 硬编码（Report.vue: 使用 Pinia user store）
+- [x] 新增备份路由（/backup）
+- [x] 新增侧边栏菜单项（数据备份）
 - **完成时间：** 2026-05-09
-- **提交记录：** 待提交
+- **提交记录：** `phase5-implementation`
 
 ---
 

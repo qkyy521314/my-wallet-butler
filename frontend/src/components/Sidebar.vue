@@ -40,6 +40,11 @@
         <el-icon><Upload /></el-icon>
         <span>批量导入</span>
       </el-menu-item>
+
+      <el-menu-item index="/backup">
+        <el-icon><DocumentCopy /></el-icon>
+        <span>数据备份</span>
+      </el-menu-item>
     </el-menu>
   </div>
 </template>
@@ -54,7 +59,8 @@ import {
   Tickets,
   Money,
   PieChart,
-  Upload
+  Upload,
+  DocumentCopy
 } from '@element-plus/icons-vue'
 
 const route = useRoute()
@@ -69,6 +75,7 @@ const activeMenu = computed(() => {
   if (path.startsWith('/budgets')) return '/budgets'
   if (path.startsWith('/reports')) return '/reports'
   if (path.startsWith('/import')) return '/import'
+  if (path.startsWith('/backup')) return '/backup'
   return '/dashboard'
 })
 </script>

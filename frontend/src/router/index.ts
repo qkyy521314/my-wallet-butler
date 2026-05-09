@@ -59,6 +59,12 @@ const routes = [
     name: 'Import',
     component: () => import('@/views/Import.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/backup',
+    name: 'Backup',
+    component: () => import('@/views/Backup.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 
