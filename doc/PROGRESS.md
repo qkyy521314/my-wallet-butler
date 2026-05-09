@@ -46,35 +46,46 @@
 - **提交记录：** `7d6f497`
 
 ## Phase 5 - 报表统计与数据备份 ✅ 已完成
-- [x] 报表生成
-  - [x] 月度收支统计（GET /report/monthly-summary）
-  - [x] 分类支出占比分析（GET /report/category-expense）
-  - [x] 每日收支趋势（GET /report/daily-trend）
-  - [x] 年度收支汇总（GET /report/yearly-summary）
-  - [x] 预算执行报告（GET /report/budget-execution）
-- [x] 数据可视化
-  - [x] 每日收支柱状图（ECharts）
-  - [x] 分类支出占比饼图（ECharts）
+- [x] 报表生成（JWT 认证，MySQL 兼容）
+  - [x] 收支概览统计（GET /report/summary）
+  - [x] 分类收支占比分析（GET /report/category-analysis）
+  - [x] 收支趋势分析（GET /report/trend-analysis，MySQL DATE_FORMAT）
+  - [x] 月度报表汇总（GET /report/monthly-report）
+  - [x] 预算执行情况（GET /report/budget-performance）
+- [x] 数据可视化（ECharts 5.x）
+  - [x] 分类收支占比饼图（环形图，支持收入/支出切换）
+  - [x] 收支趋势折线图（支持按天/周/月分组）
+  - [x] 收支概览卡片（总收入/总支出/净收入）
   - [x] 预算执行进度条（Element Plus Progress）
-  - [x] 月度汇总卡片（总收入/总支出/净收支）
+  - [x] 月度报表详情（分类+预算表格）
 - [x] 数据导出
-  - [x] CSV 导出（GET /report/export/csv，UTF-8 BOM）
-  - [x] Excel 导出（GET /report/export/excel，openpyxl，自动列宽）
-  - [x] 前端导出下拉按钮（Report.vue）
-- [x] 数据备份
-  - [x] 创建备份（POST /report/backup，mysqldump）
-  - [x] 备份列表（GET /report/backups）
-  - [x] 删除备份（DELETE /report/backups/{filename}，含路径遍历防护）
-  - [x] 备份管理页面（Backup.vue）
+  - [x] CSV 导出（GET /report/export/csv，UTF-8 BOM，含分类/账户/标签）
+  - [x] Excel 导出（GET /report/export/excel，openpyxl，自动列宽，含汇总页）
+  - [x] 前端导出按钮（Report.vue，支持日期范围筛选）
+- [x] 数据备份（JSON 格式，无需 mysqldump）
+  - [x] 创建备份（POST /report/backup，JSON 序列化所有用户数据）
+  - [x] 备份列表（GET /report/backup/list，含记录数统计）
+  - [x] 下载备份（GET /report/backup/download/{filename}）
+  - [x] 删除备份（DELETE /report/backup/delete/{filename}，用户隔离）
+  - [x] 备份管理页面（Backup.vue，支持下载/恢复/删除）
 - [x] 数据恢复
-  - [x] 从备份恢复（POST /report/restore，mysql 命令行）
-  - [x] 恢复确认对话框（ElMessageBox 二次确认）
-- [x] 修复 MySQL 兼容性（report.py: to_char → DATE_FORMAT）
-- [x] 修复前端 user_id 硬编码（Report.vue: 使用 Pinia user store）
-- [x] 新增备份路由（/backup）
-- [x] 新增侧边栏菜单项（数据备份）
+  - [x] 从已有备份恢复（POST /report/restore，支持合并/替换模式）
+  - [x] 从上传文件恢复（POST /report/restore/upload，支持合并/替换模式）
+  - [x] ID 映射（恢复时自动重建外键关联）
+  - [x] 二次确认（ElMessageBox 危险操作确认）
+- [x] 安全加固
+  - [x] 所有报表端点改用 JWT 认证（get_current_user）
+  - [x] 移除 query 参数 user_id（从 JWT token 提取）
+  - [x] 备份文件用户隔离（文件名含 user_id，访问时验证）
+  - [x] 路径遍历防护（os.path.basename 清理文件名）
+- [x] 前端修复
+  - [x] 移除 Report.vue 中硬编码的 user_id
+  - [x] 移除所有 API 调用中的 user_id 参数（改用 JWT）
+  - [x] 统一前后端端点路径（/summary, /category-analysis 等）
+  - [x] Report.vue 集成导出和备份恢复功能
+  - [x] Backup.vue 独立页面（上传恢复 + 备份管理）
 - **完成时间：** 2026-05-09
-- **提交记录：** `phase5-implementation`
+- **提交记录：** `phase5-final`
 
 ---
 
