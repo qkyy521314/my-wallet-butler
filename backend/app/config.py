@@ -19,5 +19,8 @@ class Settings(BaseSettings):
     # Redis 配置（可选）
     REDIS_URL: Optional[str] = os.getenv("REDIS_URL", None)
 
+    # 备份目录
+    BACKUP_DIR: str = os.getenv("BACKUP_DIR", "./backups")
+
 
 settings = Settings()
