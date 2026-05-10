@@ -12,7 +12,7 @@ class TransactionBase(BaseModel):
     account_id: int
     from_account_id: Optional[int] = None  # For transfers
     to_account_id: Optional[int] = None    # For transfers
-    date: datetime
+    date: Optional[datetime] = None
     is_active: Optional[bool] = True
 
 

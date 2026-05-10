@@ -12,6 +12,19 @@ from ..database import get_db
 security = HTTPBearer()
 
 
+async def authenticate_user(db: AsyncSession, username: str, password: str):
+    """
+    验证用户凭据
+    """
+    from ..utils.security import verify_password
+    user = await crud.user.get_by_username(db, username=username)
+    if not user:
+        return None
+    if not verify_password(password, user.hashed_password):
+        return None
+    return user
+
+
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     """
     创建访问令牌

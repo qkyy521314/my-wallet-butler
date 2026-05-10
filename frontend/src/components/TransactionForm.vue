@@ -2,9 +2,9 @@
   <el-form :model="formData" :rules="rules" ref="formRef" label-width="100px">
     <el-form-item label="交易类型" prop="transaction_type">
       <el-radio-group v-model="formData.transaction_type" @change="onTransactionTypeChange">
-        <el-radio label="income">收入</el-radio>
-        <el-radio label="expense">支出</el-radio>
-        <el-radio label="transfer">转账</el-radio>
+        <el-radio value="income">收入</el-radio>
+        <el-radio value="expense">支出</el-radio>
+        <el-radio value="transfer">转账</el-radio>
       </el-radio-group>
     </el-form-item>
 

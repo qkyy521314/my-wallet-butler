@@ -104,7 +104,7 @@
       <el-dialog v-model="statsDialogVisible" title="预算统计详情" width="600px">
         <div v-if="selectedStats">
           <el-descriptions :column="1" border>
-            <el-descriptions-item label="预算名称">{{ selectedStats.name }}</el-description-item>
+            <el-descriptions-item label="预算名称">{{ selectedStats.name }}</el-descriptions-item>
             <el-descriptions-item label="总预算金额">{{ amountFormatter(null, null, selectedStats.total_amount) }}</el-descriptions-item>
             <el-descriptions-item label="已花费">{{ amountFormatter(null, null, selectedStats.spent_amount) }}</el-descriptions-item>
             <el-descriptions-item label="剩余预算">{{ amountFormatter(null, null, selectedStats.remaining_amount) }}</el-descriptions-item>

@@ -13,6 +13,7 @@ router = APIRouter()
 
 
 @router.get("/")
+@router.get("")
 async def get_accounts(
     db: AsyncSession = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
@@ -34,8 +35,11 @@ async def get_accounts(
 
     total_pages = (total + size - 1) // size  # 向上取整
 
+    # Convert SQLAlchemy models to dicts
+    items = [schemas.AccountInDB.model_validate(a).model_dump() for a in accounts]
+
     paginated_data = {
-        "items": accounts,
+        "items": items,
         "total": total,
         "page": page,
         "size": size,
@@ -52,17 +56,20 @@ async def get_account(account_id: int,
     account = await crud.account.get(db, account_id, user_id=current_user.id)
     if not account:
         raise HTTPException(status_code=404, detail="Account not found or insufficient permissions")
-    return SuccessResponse(code=200, message="Account retrieved successfully", data=account)
+    account_out = schemas.AccountInDB.model_validate(account)
+    return SuccessResponse(code=200, message="Account retrieved successfully", data=account_out.model_dump())
 
 
 @router.post("/")
+@router.post("")
 async def create_account(
     account: schemas.AccountCreate,
     db: AsyncSession = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
     db_account = await crud.account.create(db, account, user_id=current_user.id)
-    return SuccessResponse(code=200, message="Account created successfully", data=db_account)
+    account_out = schemas.AccountInDB.model_validate(db_account)
+    return SuccessResponse(code=200, message="Account created successfully", data=account_out.model_dump())
 
 
 @router.put("/{account_id}")
@@ -77,7 +84,8 @@ async def update_account(
         raise HTTPException(status_code=404, detail="Account not found or insufficient permissions")
 
     updated_account = await crud.account.update(db, db_obj=db_account, obj_in=account_update)
-    return SuccessResponse(code=200, message="Account updated successfully", data=updated_account)
+    account_out = schemas.AccountInDB.model_validate(updated_account)
+    return SuccessResponse(code=200, message="Account updated successfully", data=account_out.model_dump())
 
 
 @router.delete("/{account_id}")

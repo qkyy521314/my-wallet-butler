@@ -2,8 +2,8 @@ from typing import Any, Dict, List, Optional, Union
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
-from .models.user import User
-from .schemas.user import UserCreate, UserUpdate
+from app.models.user import User
+from app.schemas.user import UserCreate, UserUpdate
 
 
 class CRUDUser:
@@ -28,12 +28,17 @@ class CRUDUser:
         return result.scalars().all()
 
     async def create(self, db: AsyncSession, obj_in: UserCreate) -> User:
+        # Support both UserCreate and dict (for hashed_password)
+        if isinstance(obj_in, dict):
+            data = obj_in
+        else:
+            data = obj_in.model_dump()
         db_obj = User(
-            username=obj_in.username,
-            email=obj_in.email,
-            hashed_password=obj_in.hashed_password,
-            first_name=obj_in.first_name,
-            last_name=obj_in.last_name,
+            username=data['username'],
+            email=data['email'],
+            hashed_password=data.get('hashed_password', ''),
+            first_name=data.get('first_name'),
+            last_name=data.get('last_name'),
         )
         db.add(db_obj)
         await db.commit()

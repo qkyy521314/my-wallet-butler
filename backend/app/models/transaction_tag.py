@@ -11,8 +11,8 @@ class TransactionTag(Base):
     tag_id = Column(Integer, ForeignKey("tags.id"), nullable=False)
 
     # Relationships
-    transaction = relationship("Transaction", back_populates="tags")
-    tag = relationship("Tag", back_populates="transactions")
+    transaction = relationship("Transaction")
+    tag = relationship("Tag")
 
     def __repr__(self):
         return f"<TransactionTag(transaction_id={self.transaction_id}, tag_id={self.tag_id})>"

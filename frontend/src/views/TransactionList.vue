@@ -34,9 +34,9 @@
         <el-form :model="transactionForm" :rules="rules" ref="formRef" label-width="100px">
           <el-form-item label="交易类型" prop="transaction_type">
             <el-radio-group v-model="transactionForm.transaction_type" @change="onTransactionTypeChange">
-              <el-radio label="income">收入</el-radio>
-              <el-radio label="expense">支出</el-radio>
-              <el-radio label="transfer">转账</el-radio>
+              <el-radio value="income">收入</el-radio>
+              <el-radio value="expense">支出</el-radio>
+              <el-radio value="transfer">转账</el-radio>
             </el-radio-group>
           </el-form-item>
 
@@ -200,7 +200,7 @@ const loadTransactions = async () => {
   try {
     loading.value = true
     const response = await getTransactions()
-    transactions.value = response.data
+    transactions.value = response.data.data?.items || []
   } catch (error) {
     console.error('Failed to load transactions:', error)
     ElMessage.error('加载交易数据失败')
@@ -213,7 +213,7 @@ const loadTransactions = async () => {
 const loadCategories = async () => {
   try {
     const response = await getCategories()
-    categories.value = response.data
+    categories.value = response.data.data?.items || []
   } catch (error) {
     console.error('Failed to load categories:', error)
     ElMessage.error('加载分类数据失败')
@@ -224,7 +224,7 @@ const loadCategories = async () => {
 const loadAccounts = async () => {
   try {
     const response = await getAccounts()
-    accounts.value = response.data
+    accounts.value = response.data.data?.items || []
   } catch (error) {
     console.error('Failed to load accounts:', error)
     ElMessage.error('加载账户数据失败')

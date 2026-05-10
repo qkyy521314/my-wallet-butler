@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -76,7 +77,7 @@ class CRUDTransaction:
             account_id=obj_in.account_id,
             from_account_id=getattr(obj_in, 'from_account_id', None),
             to_account_id=getattr(obj_in, 'to_account_id', None),
-            date=getattr(obj_in, 'date', func.now()),
+            date=getattr(obj_in, 'date', None) or datetime.now(),
             is_active=obj_in.is_active,
             user_id=user_id,
         )

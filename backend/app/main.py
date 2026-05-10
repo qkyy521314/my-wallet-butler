@@ -15,13 +15,13 @@ app.add_middleware(
 
 # 包含路由器
 app.include_router(auth.router, prefix="/api/v1", tags=["auth"])
-app.include_router(account.router, prefix="/api/v1", tags=["account"])
-app.include_router(category.router, prefix="/api/v1", tags=["category"])
-app.include_router(transaction.router, prefix="/api/v1", tags=["transaction"])
-app.include_router(tag.router, prefix="/api/v1", tags=["tag"])
-app.include_router(budget.router, prefix="/api/v1", tags=["budget"])
-app.include_router(report.router, prefix="/api/v1", tags=["report"])
-app.include_router(import_transactions.router, prefix="/api/v1", tags=["import"])
+app.include_router(account.router, prefix="/api/v1/accounts", tags=["account"])
+app.include_router(category.router, prefix="/api/v1/categories", tags=["category"])
+app.include_router(transaction.router, prefix="/api/v1/transactions", tags=["transaction"])
+app.include_router(tag.router, prefix="/api/v1/tags", tags=["tag"])
+app.include_router(budget.router, prefix="/api/v1/budgets", tags=["budget"])
+app.include_router(report.router, prefix="/api/v1/report", tags=["report"])
+app.include_router(import_transactions.router, prefix="/api/v1/import", tags=["import"])
 
 @app.get("/")
 async def root():

@@ -77,7 +77,7 @@
             </el-table-column>
           </el-table>
 
-          <el-empty v-if="!loading && backups.length === 0" description="暂无备份文件，点击上方"立即备份"创建" />
+          <el-empty v-if="!loading && backups.length === 0" description="暂无备份文件，点击上方【立即备份】创建" />
         </el-card>
       </el-tab-pane>
 
@@ -118,8 +118,8 @@
             <div class="restore-options">
               <span style="margin-right: 12px; color: #606266;">恢复模式：</span>
               <el-radio-group v-model="restoreMode">
-                <el-radio label="merge">合并模式（保留现有数据）</el-radio>
-                <el-radio label="replace">替换模式（清空现有数据）</el-radio>
+                <el-radio value="merge">合并模式（保留现有数据）</el-radio>
+                <el-radio value="replace">替换模式（清空现有数据）</el-radio>
               </el-radio-group>
             </div>
 

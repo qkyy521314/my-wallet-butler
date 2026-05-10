@@ -11,7 +11,7 @@ class CategoryBase(BaseModel):
 
 
 class CategoryCreate(CategoryBase):
-    pass
+    parent_id: Optional[int] = None
 
 
 class CategoryUpdate(BaseModel):
@@ -19,6 +19,7 @@ class CategoryUpdate(BaseModel):
     category_type: Optional[str] = None
     description: Optional[str] = None
     is_active: Optional[bool] = None
+    parent_id: Optional[int] = None
 
 
 class CategoryInDBBase(CategoryBase):

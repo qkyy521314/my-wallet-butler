@@ -35,8 +35,8 @@
           </el-form-item>
           <el-form-item label="分类类型" prop="category_type">
             <el-radio-group v-model="categoryForm.category_type">
-              <el-radio label="income">收入</el-radio>
-              <el-radio label="expense">支出</el-radio>
+              <el-radio value="income">收入</el-radio>
+              <el-radio value="expense">支出</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="描述">
@@ -97,7 +97,7 @@ const loadCategories = async () => {
   try {
     loading.value = true
     const response = await categoryStore.fetchCategories()
-    categories.value = response.data
+    categories.value = response.data.data?.items || [].data?.items || []
   } catch (error) {
     console.error('Failed to load categories:', error)
     ElMessage.error('加载分类数据失败')

@@ -16,7 +16,7 @@ export const useCategoryStore = defineStore('category', {
     async fetchCategories() {
       try {
         const response = await getCategories()
-        this.categories = response.data
+        this.categories = response.data.data?.items || []
         return response
       } catch (error) {
         console.error('Failed to fetch categories:', error)

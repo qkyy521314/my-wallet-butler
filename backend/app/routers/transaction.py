@@ -23,6 +23,7 @@ class TransferRequest(BaseModel):
 router = APIRouter()
 
 
+@router.get("")
 @router.get("/")
 async def get_transactions(
     db: AsyncSession = Depends(get_db),
@@ -53,8 +54,10 @@ async def get_transactions(
 
     total_pages = (total + size - 1) // size  # 向上取整
 
+    items = [schemas.TransactionInDB.model_validate(t).model_dump() for t in transactions]
+
     paginated_data = {
-        "items": transactions,
+        "items": items,
         "total": total,
         "page": page,
         "size": size,
@@ -73,17 +76,20 @@ async def get_transaction(
     transaction = await crud.transaction.get(db, transaction_id, user_id=current_user.id)
     if not transaction:
         raise HTTPException(status_code=404, detail="Transaction not found or insufficient permissions")
-    return SuccessResponse(code=200, message="Transaction retrieved successfully", data=transaction)
+    transaction_out = schemas.TransactionInDB.model_validate(transaction)
+    return SuccessResponse(code=200, message="Transaction retrieved successfully", data=transaction_out.model_dump())
 
 
 @router.post("/")
+@router.post("")
 async def create_transaction(
     transaction: schemas.TransactionCreate,
     db: AsyncSession = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
     db_transaction = await crud.transaction.create(db, transaction, user_id=current_user.id)
-    return SuccessResponse(code=200, message="Transaction created successfully", data=db_transaction)
+    transaction_out = schemas.TransactionInDB.model_validate(db_transaction)
+    return SuccessResponse(code=200, message="Transaction created successfully", data=transaction_out.model_dump())
 
 
 @router.put("/{transaction_id}")
@@ -98,7 +104,8 @@ async def update_transaction(
         raise HTTPException(status_code=404, detail="Transaction not found or insufficient permissions")
 
     updated_transaction = await crud.transaction.update(db, db_obj=db_transaction, obj_in=transaction_update)
-    return SuccessResponse(code=200, message="Transaction updated successfully", data=updated_transaction)
+    transaction_out = schemas.TransactionInDB.model_validate(updated_transaction)
+    return SuccessResponse(code=200, message="Transaction updated successfully", data=transaction_out.model_dump())
 
 
 @router.delete("/{transaction_id}")

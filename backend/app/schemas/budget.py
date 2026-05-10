@@ -15,7 +15,7 @@ class BudgetBase(BaseModel):
 
 
 class BudgetCreate(BudgetBase):
-    pass
+    user_id: Optional[int] = None
 
 
 class BudgetUpdate(BaseModel):

@@ -73,7 +73,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 const accountStore = useAccountStore()
 
 // 定义响应式数据
-const accounts = ref([])
+const accounts = ref<any[]>([])
 const loading = ref(true)
 const dialogVisible = ref(false)
 const isEdit = ref(false)
@@ -116,7 +116,8 @@ const loadAccounts = async () => {
   try {
     loading.value = true
     const response = await accountStore.fetchAccounts()
-    accounts.value = response.data
+    // response.data = { code: 200, message: "...", data: { items: [...], total: 0 } }
+    accounts.value = response.data.data?.items || []
   } catch (error) {
     console.error('Failed to load accounts:', error)
     ElMessage.error('加载账户数据失败')

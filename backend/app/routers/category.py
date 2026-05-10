@@ -13,6 +13,7 @@ router = APIRouter()
 
 
 @router.get("/")
+@router.get("")
 async def get_categories(
     db: AsyncSession = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
@@ -42,8 +43,10 @@ async def get_categories(
 
         total_pages = (total + size - 1) // size  # 向上取整
 
+        items = [schemas.CategoryInDB.model_validate(c).model_dump() for c in categories]
+
         paginated_data = {
-            "items": categories,
+            "items": items,
             "total": total,
             "page": page,
             "size": size,
@@ -62,17 +65,20 @@ async def get_category(
     category = await crud.category.get(db, category_id, user_id=current_user.id)
     if not category:
         raise HTTPException(status_code=404, detail="Category not found or insufficient permissions")
-    return SuccessResponse(code=200, message="Category retrieved successfully", data=category)
+    category_out = schemas.CategoryInDB.model_validate(category)
+    return SuccessResponse(code=200, message="Category retrieved successfully", data=category_out.model_dump())
 
 
 @router.post("/")
+@router.post("")
 async def create_category(
     category: schemas.CategoryCreate,
     db: AsyncSession = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
     db_category = await crud.category.create(db, category, user_id=current_user.id)
-    return SuccessResponse(code=200, message="Category created successfully", data=db_category)
+    category_out = schemas.CategoryInDB.model_validate(db_category)
+    return SuccessResponse(code=200, message="Category created successfully", data=category_out.model_dump())
 
 
 @router.put("/{category_id}")
@@ -87,7 +93,8 @@ async def update_category(
         raise HTTPException(status_code=404, detail="Category not found or insufficient permissions")
 
     updated_category = await crud.category.update(db, db_obj=db_category, obj_in=category_update)
-    return SuccessResponse(code=200, message="Category updated successfully", data=updated_category)
+    category_out = schemas.CategoryInDB.model_validate(updated_category)
+    return SuccessResponse(code=200, message="Category updated successfully", data=category_out.model_dump())
 
 
 @router.delete("/{category_id}")

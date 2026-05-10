@@ -25,6 +25,4 @@ class Account(Base):
         return f"<Account(id={self.id}, name='{self.name}', balance={self.balance})>"
 
 
-# 在 User 模型中添加反向关系
-if not hasattr(User, 'accounts'):
-    User.accounts = relationship("Account", back_populates="user", lazy="select")
+# Relationship is handled via User.accounts back_populates

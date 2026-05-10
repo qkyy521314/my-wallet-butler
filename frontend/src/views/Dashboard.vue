@@ -107,7 +107,9 @@ const accountBalances = ref([])
 
 // 金额格式化函数
 const amountFormatter = (row: any, column: any, cellValue: any) => {
-  return `¥ ${cellValue.toFixed(2)}`
+  const num = parseFloat(cellValue)
+  if (isNaN(num)) return '¥ 0.00'
+  return `¥ ${num.toFixed(2)}`
 }
 
 // 日期格式化函数

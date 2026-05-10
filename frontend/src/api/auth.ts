@@ -5,7 +5,7 @@ export const login = (credentials: { username: string, password: string }) => {
   formData.append('username', credentials.username)
   formData.append('password', credentials.password)
 
-  return request.post('/auth/login', formData, {
+  return request.post('/login', formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
@@ -13,15 +13,17 @@ export const login = (credentials: { username: string, password: string }) => {
 }
 
 export const register = (userData: { username: string, email: string, password: string }) => {
-  return request.post('/auth/register', userData)
+  return request.post('/register', userData)
 }
 
 export const getUserInfo = () => {
-  return request.get('/auth/me')
+  return request.get('/me')
 }
 
+export const getMe = getUserInfo
+
 export const updateUserProfile = (userData: { username?: string, email?: string, first_name?: string, last_name?: string }) => {
-  return request.put('/auth/profile', userData)
+  return request.put('/profile', userData)
 }
 
 export const logout = () => {

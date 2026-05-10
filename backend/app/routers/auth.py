@@ -21,9 +21,11 @@ async def register_user(user: schemas.UserCreate, db: AsyncSession = Depends(get
         )
 
     # 创建新用户
-    user.hashed_password = utils.security.get_password_hash(user.password)
-    db_user = await crud.user.create(db, user)
-    return SuccessResponse(code=200, message="User registered successfully", data=db_user)
+    user_data = user.model_dump()
+    user_data['hashed_password'] = utils.security.get_password_hash(user.password)
+    db_user = await crud.user.create(db, user_data)
+    user_out = schemas.User.model_validate(db_user)
+    return SuccessResponse(code=200, message="User registered successfully", data=user_out.model_dump())
 
 
 @router.post("/login", response_model=SuccessResponse)
@@ -46,7 +48,8 @@ async def read_users_me(current_user: models.User = Depends(get_current_user)):
     """
     获取当前用户信息
     """
-    return SuccessResponse(code=200, message="User information retrieved", data=current_user)
+    user_out = schemas.User.model_validate(current_user)
+    return SuccessResponse(code=200, message="User information retrieved", data=user_out.model_dump())
 
 
 @router.put("/profile", response_model=SuccessResponse)
@@ -59,4 +62,5 @@ async def update_profile(
     更新用户个人信息
     """
     updated_user = await crud.user.update(db, db_obj=current_user, obj_in=user_update)
-    return SuccessResponse(code=200, message="Profile updated successfully", data=updated_user)
+    user_out = schemas.User.model_validate(updated_user)
+    return SuccessResponse(code=200, message="Profile updated successfully", data=user_out.model_dump())

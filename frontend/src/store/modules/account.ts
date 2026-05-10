@@ -16,7 +16,7 @@ export const useAccountStore = defineStore('account', {
     async fetchAccounts() {
       try {
         const response = await getAccounts()
-        this.accounts = response.data
+        this.accounts = response.data.data?.items || response.data.data || []
         return response
       } catch (error) {
         console.error('Failed to fetch accounts:', error)

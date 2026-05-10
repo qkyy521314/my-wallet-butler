@@ -2,12 +2,15 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 from ..database import get_db
-from .. import schemas, crud
+from .. import schemas, crud, models
+from ..services.auth import get_current_user
+from ..schemas.common import SuccessResponse
 from ..utils.exceptions import InsufficientPermissions
 
 router = APIRouter()
 
 
+@router.get("")
 @router.get("/", response_model=List[schemas.Tag])
 async def get_tags(
     db: AsyncSession = Depends(get_db),
@@ -26,7 +29,8 @@ async def get_tag(tag_id: int, db: AsyncSession = Depends(get_db)):
     return tag
 
 
-@router.post("/", response_model=schemas.Tag)
+@router.post("/")
+@router.post("")
 async def create_tag(
     tag: schemas.TagCreate,
     db: AsyncSession = Depends(get_db)

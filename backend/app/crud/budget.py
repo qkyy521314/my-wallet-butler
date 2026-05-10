@@ -14,12 +14,15 @@ class CRUDBudget:
         return result.scalars().first()
 
     async def get_multi(
-        self, db: AsyncSession, *, skip: int = 0, limit: int = 100
+        self, db: AsyncSession, *, skip: int = 0, limit: int = 100, user_id: int = None
     ) -> List[Budget]:
-        result = await db.execute(select(Budget).offset(skip).limit(limit))
+        query = select(Budget)
+        if user_id:
+            query = query.where(Budget.user_id == user_id)
+        result = await db.execute(query.offset(skip).limit(limit))
         return result.scalars().all()
 
-    async def create(self, db: AsyncSession, obj_in: BudgetCreate) -> Budget:
+    async def create(self, db: AsyncSession, obj_in: BudgetCreate, user_id: int = None) -> Budget:
         db_obj = Budget(
             name=obj_in.name,
             category_id=obj_in.category_id,
@@ -28,7 +31,7 @@ class CRUDBudget:
             period_end=obj_in.period_end,
             description=obj_in.description,
             is_active=obj_in.is_active,
-            user_id=obj_in.user_id,  # This might need adjustment depending on auth implementation
+            user_id=user_id or obj_in.user_id,
             spent_amount=0.00,  # 默认支出金额为0
         )
         db.add(db_obj)

@@ -67,8 +67,8 @@
           <div class="card-header-row">
             <h3>🍩 分类支出占比</h3>
             <el-radio-group v-model="analysisType" size="small" @change="loadCategoryData">
-              <el-radio-button label="expense">支出</el-radio-button>
-              <el-radio-button label="income">收入</el-radio-button>
+              <el-radio-button value="expense">支出</el-radio-button>
+              <el-radio-button value="income">收入</el-radio-button>
             </el-radio-group>
           </div>
         </template>
@@ -81,9 +81,9 @@
           <div class="card-header-row">
             <h3>📈 收支趋势</h3>
             <el-radio-group v-model="trendGroupBy" size="small" @change="loadTrendData">
-              <el-radio-button label="day">按天</el-radio-button>
-              <el-radio-button label="week">按周</el-radio-button>
-              <el-radio-button label="month">按月</el-radio-button>
+              <el-radio-button value="day">按天</el-radio-button>
+              <el-radio-button value="week">按周</el-radio-button>
+              <el-radio-button value="month">按月</el-radio-button>
             </el-radio-group>
           </div>
         </template>
@@ -264,8 +264,8 @@
               />
             </el-select>
             <el-radio-group v-model="restoreMode" style="margin-right: 12px;">
-              <el-radio label="merge">合并模式</el-radio>
-              <el-radio label="replace">替换模式（清空现有数据）</el-radio>
+              <el-radio value="merge">合并模式</el-radio>
+              <el-radio value="replace">替换模式（清空现有数据）</el-radio>
             </el-radio-group>
             <el-button type="warning" @click="handleRestoreFromBackup" :loading="restoring" :disabled="!selectedBackup">
               🔄 恢复数据
@@ -286,8 +286,8 @@
             </el-upload>
             <div style="margin-top: 12px;">
               <el-radio-group v-model="restoreMode" style="margin-right: 12px;">
-                <el-radio label="merge">合并模式</el-radio>
-                <el-radio label="replace">替换模式（清空现有数据）</el-radio>
+                <el-radio value="merge">合并模式</el-radio>
+                <el-radio value="replace">替换模式（清空现有数据）</el-radio>
               </el-radio-group>
               <el-button type="warning" @click="handleRestoreFromUpload" :loading="restoring" :disabled="!uploadFile">
                 🔄 从文件恢复
