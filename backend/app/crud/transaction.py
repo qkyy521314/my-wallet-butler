@@ -5,6 +5,7 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy import func
 from ..models.transaction import Transaction
+from ..models.transaction_tag import TransactionTag
 from ..schemas.transaction import TransactionCreate, TransactionUpdate
 
 
@@ -103,14 +104,21 @@ class CRUDTransaction:
         await db.refresh(db_obj)
         return db_obj
 
-    async def remove(self, db: AsyncSession, id: int, user_id: int = None) -> Transaction:
-        stmt = select(Transaction).where(Transaction.id == id)
-        if user_id:
-            stmt = stmt.where(Transaction.user_id == user_id)
-        result = await db.execute(stmt)
-        obj = result.scalars().first()
+    async def remove(self, db: AsyncSession, id: int, user_id: int = None, obj: Transaction = None) -> Transaction:
+        if obj is None:
+            stmt = select(Transaction).where(Transaction.id == id)
+            if user_id:
+                stmt = stmt.where(Transaction.user_id == user_id)
+            result = await db.execute(stmt)
+            obj = result.scalars().first()
 
         if obj:
+            # Delete associated transaction_tags before deleting the transaction
+            tag_stmt = select(TransactionTag).where(TransactionTag.transaction_id == obj.id)
+            tag_result = await db.execute(tag_stmt)
+            for tag_row in tag_result.scalars().all():
+                await db.delete(tag_row)
+
             await db.delete(obj)
             await db.commit()
         return obj

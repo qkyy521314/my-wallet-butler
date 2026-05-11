@@ -7,8 +7,8 @@ class TransactionTag(Base):
     __tablename__ = "transaction_tags"
 
     id = Column(Integer, primary_key=True, index=True)
-    transaction_id = Column(Integer, ForeignKey("transactions.id"), nullable=False)
-    tag_id = Column(Integer, ForeignKey("tags.id"), nullable=False)
+    transaction_id = Column(Integer, ForeignKey("transactions.id", ondelete="CASCADE"), nullable=False)
+    tag_id = Column(Integer, ForeignKey("tags.id", ondelete="CASCADE"), nullable=False)
 
     # Relationships
     transaction = relationship("Transaction")

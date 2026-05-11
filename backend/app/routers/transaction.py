@@ -118,7 +118,7 @@ async def delete_transaction(
     if not transaction:
         raise HTTPException(status_code=404, detail="Transaction not found or insufficient permissions")
 
-    await crud.transaction.remove(db, transaction_id, user_id=current_user.id)
+    await crud.transaction.remove(db, transaction_id, obj=transaction)
     return SuccessResponse(code=200, message="Transaction deleted successfully", data=None)
 
 

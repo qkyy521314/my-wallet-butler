@@ -70,6 +70,17 @@ CREATE TABLE IF NOT EXISTS transactions (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- 创建交易 - 标签关联表（多对多）
+CREATE TABLE IF NOT EXISTS transaction_tags (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    transaction_id INT NOT NULL,
+    tag_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_transaction_tag (transaction_id, tag_id)
+);
+
 -- 创建标签表
 CREATE TABLE IF NOT EXISTS tags (
     id INT AUTO_INCREMENT PRIMARY KEY,
