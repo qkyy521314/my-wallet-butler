@@ -29,6 +29,7 @@ const isRegisterPage = computed(() => route.path === '/register')
 <style scoped>
 .layout-container {
   height: 100vh;
+  display: flex;
 }
 
 .el-aside {
@@ -36,6 +37,7 @@ const isRegisterPage = computed(() => route.path === '/register')
   color: #fff;
   height: 100vh;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .el-header {
@@ -46,11 +48,22 @@ const isRegisterPage = computed(() => route.path === '/register')
   justify-content: space-between;
   box-shadow: 0 1px 4px rgba(0,21,41,.08);
   padding: 0 20px;
+  height: 60px;
   z-index: 100;
 }
 
 .el-main {
   background-color: #f0f2f5;
-  padding: 0;
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* 确保内部容器占满剩余高度 */
+.layout-container > .el-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  flex: 1;
 }
 </style>

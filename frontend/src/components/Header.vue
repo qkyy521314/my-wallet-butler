@@ -61,25 +61,42 @@ const handleCommand = (command: string) => {
   justify-content: space-between;
   align-items: center;
   height: 100%;
+  width: 100%;
 }
 
 .logo h3 {
   margin: 0;
   color: #409EFF;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .user-info {
   display: flex;
   align-items: center;
+  margin-left: auto;
 }
 
 .username {
   margin: 0 10px;
+  color: #333;
+  font-size: 14px;
 }
 
 .el-dropdown-link {
   cursor: pointer;
   display: flex;
   align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.el-dropdown-link:hover {
+  background-color: #f5f7fa;
+}
+
+:deep(.el-icon--right) {
+  margin-left: 4px;
 }
 </style>

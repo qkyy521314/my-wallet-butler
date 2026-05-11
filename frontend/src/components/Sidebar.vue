@@ -82,11 +82,32 @@ const activeMenu = computed(() => {
 
 <style scoped>
 .sidebar-container {
-  height: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .el-menu-vertical:not(.el-menu--collapse) {
   width: 200px;
-  min-height: 400px;
+  height: 100%;
+  border-right: none;
+  background-color: #545c64;
+}
+
+/* 菜单项样式 */
+:deep(.el-menu-item) {
+  color: #fff;
+}
+
+:deep(.el-menu-item:hover) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+:deep(.el-menu-item.is-active) {
+  background-color: #409EFF;
+}
+
+:deep(.el-icon) {
+  color: #fff;
 }
 </style>
