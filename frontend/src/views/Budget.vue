@@ -210,7 +210,7 @@ const loadBudgets = async () => {
   try {
     loading.value = true
     const response = await getBudgets()
-    budgets.value = response.data
+    budgets.value = response.data.data?.items || response.data.data || []
   } catch (error) {
     console.error('Failed to load budgets:', error)
     ElMessage.error('加载预算数据失败')
@@ -223,7 +223,7 @@ const loadBudgets = async () => {
 const loadCategories = async () => {
   try {
     const response = await getCategories()
-    categories.value = response.data
+    categories.value = response.data.data?.items || response.data.data || []
   } catch (error) {
     console.error('Failed to load categories:', error)
     ElMessage.error('加载分类数据失败')
