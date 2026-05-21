@@ -26,11 +26,14 @@ request.interceptors.request.use(
 // 响应拦截器
 request.interceptors.response.use(
   response => {
+    // 解包 SuccessResponse 结构
+    if (response.data && response.data.code !== undefined && response.data.data !== undefined) {
+      return { ...response, data: response.data.data }
+    }
     return response
   },
   error => {
     if (error.response?.status === 401) {
-      // 清除本地存储的token并跳转到登录页
       localStorage.removeItem('token')
       window.location.href = '/login'
     }

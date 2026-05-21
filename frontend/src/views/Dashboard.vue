@@ -251,37 +251,26 @@ import {
   Money,
   PieChart
 } from '@element-plus/icons-vue'
-import { useAccountStore } from '@/store/modules/account'
+import { getDashboardSummary, getRecentTransactions, getAccountBalances, getBudgetOverview } from '@/api/dashboard'
 
 const router = useRouter()
-const accountStore = useAccountStore()
 
-const totalAssets = ref(15420.50)
-const monthlyIncome = ref(8500.00)
-const monthlyExpense = ref(3240.75)
+// 仪表盘统计数据
+const totalAssets = ref(0)
+const monthlyIncome = ref(0)
+const monthlyExpense = ref(0)
 const balance = computed(() => monthlyIncome.value - monthlyExpense.value)
 
 const balanceClass = computed(() => balance.value >= 0 ? 'positive' : 'negative')
 
-const recentTransactions = ref([
-  { id: 1, description: '工资收入', amount: 8500.00, date: '2023-05-15T00:00:00Z', category: { name: '工资' } },
-  { id: 2, description: '超市购物', amount: -245.50, date: '2023-05-14T00:00:00Z', category: { name: '食品' } },
-  { id: 3, description: '餐厅用餐', amount: -120.00, date: '2023-05-13T00:00:00Z', category: { name: '餐饮' } },
-  { id: 4, description: '房租支付', amount: -2000.00, date: '2023-05-01T00:00:00Z', category: { name: '住房' } },
-])
+// 最近交易
+const recentTransactions = ref<any[]>([])
 
-const accountBalances = ref([
-  { name: '现金', type: '现金', balance: 2340.50 },
-  { name: '建设银行', type: '储蓄卡', balance: 8540.00 },
-  { name: '支付宝', type: '电子钱包', balance: 4540.00 },
-])
+// 账户余额
+const accountBalances = ref<any[]>([])
 
-const budgetOverview = ref([
-  { category: '餐饮', spent: 1250, limit: 2000, percent: 62 },
-  { category: '购物', spent: 850, limit: 1500, percent: 57 },
-  { category: '交通', spent: 320, limit: 500, percent: 64 },
-  { category: '娱乐', spent: 280, limit: 800, percent: 35 },
-])
+// 预算概览
+const budgetOverview = ref<any[]>([])
 
 const formatMoney = (value: number) => {
   return value.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -301,16 +290,41 @@ const handleQuickAction = (type: string) => {
   router.push(`/transactions?action=${type}`)
 }
 
-onMounted(async () => {
-  await accountStore.fetchAccounts()
-  if (accountStore.accounts.length > 0) {
-    accountBalances.value = accountStore.accounts.map((account: any) => ({
-      name: account.name,
-      type: account.type || '主账户',
-      balance: account.balance
-    }))
-    totalAssets.value = accountStore.accounts.reduce((sum: number, acc: any) => sum + (acc.balance || 0), 0)
+// 加载仪表盘数据
+const loadDashboardData = async () => {
+  try {
+    // 并行加载所有数据
+    const [summaryRes, recentRes, accountsRes, budgetRes] = await Promise.all([
+      getDashboardSummary(),
+      getRecentTransactions(5),
+      getAccountBalances(),
+      getBudgetOverview(),
+    ])
+
+    if (summaryRes.data) {
+      totalAssets.value = summaryRes.data.total_assets
+      monthlyIncome.value = summaryRes.data.monthly_income
+      monthlyExpense.value = summaryRes.data.monthly_expense
+    }
+
+    if (recentRes.data) {
+      recentTransactions.value = recentRes.data.transactions
+    }
+
+    if (accountsRes.data) {
+      accountBalances.value = accountsRes.data.accounts
+    }
+
+    if (budgetRes.data) {
+      budgetOverview.value = budgetRes.data.budgets
+    }
+  } catch (error) {
+    console.error('加载仪表盘数据失败:', error)
   }
+}
+
+onMounted(() => {
+  loadDashboardData()
 })
 </script>
 
@@ -561,29 +575,26 @@ onMounted(async () => {
     font-weight: 500;
     color: $text-primary;
     font-size: $text-base;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    margin-bottom: 2px;
   }
 
   &__category {
-    font-size: $text-xs;
-    color: $text-tertiary;
+    font-size: $text-sm;
+    color: $text-secondary;
   }
 
   &__amount {
     font-family: $font-display;
-    font-weight: 600;
     font-size: $text-base;
-    margin-left: $space-md;
-    flex-shrink: 0;
+    font-weight: 600;
+    margin-left: auto;
 
     &.positive {
       color: $success-color;
     }
 
     &.negative {
-      color: $text-primary;
+      color: $danger-color;
     }
   }
 }
@@ -609,14 +620,14 @@ onMounted(async () => {
     width: 40px;
     height: 40px;
     border-radius: $radius-md;
-    background: linear-gradient(135deg, $primary-color 0%, $primary-light 100%);
-    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 18px;
     margin-right: $space-md;
     flex-shrink: 0;
+    background: rgba($primary-color, 0.1);
+    color: $primary-color;
   }
 
   &__info {
@@ -630,48 +641,43 @@ onMounted(async () => {
     font-weight: 500;
     color: $text-primary;
     font-size: $text-base;
+    margin-bottom: 2px;
   }
 
   &__type {
-    font-size: $text-xs;
-    color: $text-tertiary;
+    font-size: $text-sm;
+    color: $text-secondary;
   }
 
   &__balance {
     font-family: $font-display;
-    font-weight: 600;
     font-size: $text-base;
+    font-weight: 600;
     color: $text-primary;
-    margin-left: $space-md;
-    flex-shrink: 0;
   }
 }
 
 .accounts-summary {
-  margin-top: $space-md;
+  margin-top: $space-lg;
   padding-top: $space-md;
   border-top: 1px solid $border-light;
-  display: flex;
-  justify-content: space-between;
 
   .summary-item {
     display: flex;
     justify-content: space-between;
-    width: 100%;
-    padding: $space-sm $space-md;
-  }
+    align-items: center;
 
-  .summary-label {
-    font-weight: 500;
-    color: $text-secondary;
-    font-size: $text-sm;
-  }
+    .summary-label {
+      font-size: $text-sm;
+      color: $text-secondary;
+    }
 
-  .summary-value {
-    font-family: $font-display;
-    font-weight: 600;
-    color: $primary-color;
-    font-size: $text-base;
+    .summary-value {
+      font-family: $font-display;
+      font-size: $text-lg;
+      font-weight: 600;
+      color: $primary-color;
+    }
   }
 }
 
@@ -687,15 +693,13 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   gap: $space-sm;
-  padding: $space-lg $space-md;
-  border-radius: $radius-lg;
+  padding: $space-md;
+  border-radius: $radius-md;
   cursor: pointer;
   transition: all $transition-base;
-  border: 1px solid transparent;
 
   &:hover {
-    background-color: $gray-50;
-    border-color: $border-color;
+    background: $gray-50;
     transform: translateY(-2px);
   }
 
@@ -706,7 +710,8 @@ onMounted(async () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 20px;
+    transition: all $transition-base;
 
     &--income {
       background: rgba($success-color, 0.1);
@@ -719,20 +724,20 @@ onMounted(async () => {
     }
 
     &--transfer {
-      background: rgba($info-color, 0.1);
-      color: $info-color;
+      background: rgba($primary-color, 0.1);
+      color: $primary-color;
     }
 
     &--export {
-      background: rgba($primary-color, 0.1);
-      color: $primary-color;
+      background: rgba($warning-color, 0.1);
+      color: $warning-color;
     }
   }
 
   span {
     font-size: $text-sm;
+    color: $text-primary;
     font-weight: 500;
-    color: $text-secondary;
   }
 }
 
@@ -740,72 +745,50 @@ onMounted(async () => {
 .budget-items {
   display: flex;
   flex-direction: column;
-  gap: $space-lg;
+  gap: $space-md;
 }
 
 .budget-item {
-  &__header {
+  .budget-item__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: $space-sm;
-  }
+    margin-bottom: $space-xs;
 
-  &__name {
-    font-weight: 500;
-    color: $text-primary;
-    font-size: $text-sm;
-  }
+    .budget-item__name {
+      font-weight: 500;
+      color: $text-primary;
+      font-size: $text-sm;
+    }
 
-  &__percent {
-    font-family: $font-display;
-    font-weight: 600;
-    font-size: $text-sm;
-    color: $text-secondary;
+    .budget-item__percent {
+      font-weight: 600;
+      color: $text-primary;
+      font-size: $text-sm;
+    }
   }
 
   .budget-progress {
     margin-bottom: $space-xs;
-
-    :deep(.el-progress-bar__outer) {
-      background-color: $gray-100;
-    }
   }
 
-  &__footer {
+  .budget-item__footer {
     display: flex;
     justify-content: space-between;
-    font-size: $text-xs;
-    color: $text-tertiary;
+    font-size: $text-sm;
+    color: $text-secondary;
 
-    span:first-child {
+    span:last-child {
+      color: $text-primary;
       font-weight: 500;
-      color: $text-secondary;
     }
   }
-}
-
-// Animation
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-slide-up {
-  animation: slideUp 0.5s ease forwards;
-  opacity: 0;
 }
 
 // Responsive
-@media (max-width: 1200px) {
+@media (max-width: 768px) {
   .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
   }
 
   .dashboard-grid {
@@ -816,28 +799,9 @@ onMounted(async () => {
   .dashboard-card--accounts {
     grid-row: span 1;
   }
-}
-
-@media (max-width: 768px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
 
   .quick-actions {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .stat-card {
-    flex-direction: column;
-    text-align: center;
-
-    &__icon {
-      margin: 0 auto;
-    }
-
-    &__content {
-      align-items: center;
-    }
   }
 }
 </style>

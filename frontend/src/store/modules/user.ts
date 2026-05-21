@@ -18,8 +18,20 @@ export const useUserStore = defineStore('user', {
     async login(credentials: { username: string, password: string }) {
       try {
         const response = await login(credentials)
-        const { data } = response.data  // Now the token is in response.data.data
-        const { access_token } = data
+        // 兼容两种返回格式：{data: {access_token}} 和 {data: {code, data: {access_token}}}
+        const respData = response.data
+        let access_token: string
+
+        if (respData?.data?.access_token) {
+          // 后端包装了 SuccessResponse
+          access_token = respData.data.access_token
+        } else if (respData?.access_token) {
+          // 直接返回 token
+          access_token = respData.access_token
+        } else {
+          console.error('Unexpected login response:', respData)
+          throw new Error('登录响应格式异常')
+        }
 
         this.token = access_token
         this.isAuthenticated = true

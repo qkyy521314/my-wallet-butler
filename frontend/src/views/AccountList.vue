@@ -10,7 +10,11 @@
 
       <el-table :data="accounts" style="width: 100%" v-loading="loading">
         <el-table-column prop="name" label="账户名称" />
-        <el-table-column prop="account_type" label="账户类型" />
+        <el-table-column prop="account_type" label="账户类型">
+          <template #default="scope">
+            {{ getAccountTypeText(scope.row.account_type) }}
+          </template>
+        </el-table-column>
         <el-table-column prop="balance" label="余额" :formatter="amountFormatter" />
         <el-table-column prop="currency" label="货币" />
         <el-table-column prop="created_at" label="创建时间" :formatter="dateFormatter" />
@@ -111,13 +115,26 @@ const dateFormatter = (row: any, column: any, cellValue: any) => {
   return new Date(cellValue).toLocaleDateString()
 }
 
+// 账户类型中文映射
+const accountTypeMap: Record<string, string> = {
+  cash: '现金',
+  bank: '银行储蓄卡',
+  credit_card: '信用卡',
+  alipay: '支付宝',
+  wechat: '微信钱包',
+  other: '其他'
+}
+
+const getAccountTypeText = (type: string) => {
+  return accountTypeMap[type] || type
+}
+
 // 加载账户数据
 const loadAccounts = async () => {
   try {
     loading.value = true
     const response = await accountStore.fetchAccounts()
-    // response.data = { code: 200, message: "...", data: { items: [...], total: 0 } }
-    accounts.value = response.data.data?.items || []
+    accounts.value = response.data?.items || []
   } catch (error) {
     console.error('Failed to load accounts:', error)
     ElMessage.error('加载账户数据失败')

@@ -1,6 +1,6 @@
 import request from './request'
 
-export const getBudgets = (params?: { skip?: number, limit?: number, year?: number, month?: number }) => {
+export const getBudgets = (params?: { page?: number, size?: number, year?: number, month?: number }) => {
   return request.get('/budgets', { params })
 }
 

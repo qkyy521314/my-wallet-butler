@@ -1,6 +1,6 @@
 import request from './request'
 
-export const getTransactions = (params?: { skip?: number, limit?: number }) => {
+export const getTransactions = (params?: { page?: number, size?: number }) => {
   return request.get('/transactions', { params })
 }
 

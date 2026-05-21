@@ -1,6 +1,6 @@
 import request from './request'
 
-export const getAccounts = (params?: { skip?: number, limit?: number }) => {
+export const getAccounts = (params?: { page?: number, size?: number }) => {
   return request.get('/accounts', { params })
 }
 

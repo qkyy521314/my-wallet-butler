@@ -97,7 +97,7 @@ const loadCategories = async () => {
   try {
     loading.value = true
     const response = await categoryStore.fetchCategories()
-    categories.value = response.data.data?.items || response.data.data || []
+    categories.value = response.data?.items || response.data || []
   } catch (error) {
     console.error('Failed to load categories:', error)
     ElMessage.error('加载分类数据失败')

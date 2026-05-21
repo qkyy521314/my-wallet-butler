@@ -1,6 +1,6 @@
 import request from './request'
 
-export const getCategories = (params?: { skip?: number, limit?: number }) => {
+export const getCategories = (params?: { page?: number, size?: number }) => {
   return request.get('/categories', { params })
 }
 

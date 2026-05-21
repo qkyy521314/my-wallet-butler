@@ -1,13 +1,14 @@
 import request from './request'
 
 export const login = (credentials: { username: string, password: string }) => {
-  const formData = new FormData()
-  formData.append('username', credentials.username)
-  formData.append('password', credentials.password)
+  // OAuth2PasswordRequestForm 期望 application/x-www-form-urlencoded 格式
+  const params = new URLSearchParams()
+  params.append('username', credentials.username)
+  params.append('password', credentials.password)
 
-  return request.post('/login', formData, {
+  return request.post('/login', params, {
     headers: {
-      'Content-Type': 'multipart/form-data'
+      'Content-Type': 'application/x-www-form-urlencoded'
     }
   })
 }

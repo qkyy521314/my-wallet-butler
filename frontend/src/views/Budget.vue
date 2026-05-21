@@ -10,7 +10,11 @@
 
       <el-table :data="budgets" style="width: 100%" v-loading="loading">
         <el-table-column prop="name" label="预算名称" />
-        <el-table-column prop="category.name" label="分类" />
+        <el-table-column label="分类">
+          <template #default="scope">
+            {{ getCategoryName(scope.row.category_id) }}
+          </template>
+        </el-table-column>
         <el-table-column prop="amount" label="预算金额" :formatter="amountFormatter" />
         <el-table-column prop="spent_amount" label="已花费" :formatter="amountFormatter" />
         <el-table-column prop="period_start" label="开始时间" :formatter="dateFormatter" />
@@ -171,6 +175,13 @@ const rules = {
 const formRef = ref()
 const dialogTitle = ref('新增预算')
 
+// 根据 ID 获取分类名称
+const getCategoryName = (categoryId: number | undefined) => {
+  if (!categoryId) return '-'
+  const cat = categories.value.find((c: any) => c.id === categoryId)
+  return cat?.name || '-'
+}
+
 // 金额格式化函数
 const amountFormatter = (row: any, column: any, cellValue: any) => {
   return `¥ ${parseFloat(cellValue || 0).toFixed(2)}`
@@ -210,7 +221,7 @@ const loadBudgets = async () => {
   try {
     loading.value = true
     const response = await getBudgets()
-    budgets.value = response.data.data?.items || response.data.data || []
+    budgets.value = response.data?.items || response.data || []
   } catch (error) {
     console.error('Failed to load budgets:', error)
     ElMessage.error('加载预算数据失败')
@@ -223,7 +234,7 @@ const loadBudgets = async () => {
 const loadCategories = async () => {
   try {
     const response = await getCategories()
-    categories.value = response.data.data?.items || response.data.data || []
+    categories.value = response.data?.items || response.data || []
   } catch (error) {
     console.error('Failed to load categories:', error)
     ElMessage.error('加载分类数据失败')

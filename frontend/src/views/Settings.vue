@@ -144,8 +144,8 @@ async function loadData() {
       getAccounts({ page: 1, size: 100 }),
       getCategories({ page: 1, size: 100 })
     ])
-    accounts.value = accountsRes.data.data?.items || accountsRes.data.data || []
-    categories.value = categoriesRes.data.data?.items || categoriesRes.data.data || []
+    accounts.value = accountsRes.data?.items || accountsRes.data || []
+    categories.value = categoriesRes.data?.items || categoriesRes.data || []
   } catch (err: any) {
     ElMessage.error(err.response?.data?.detail || '加载数据失败')
   }

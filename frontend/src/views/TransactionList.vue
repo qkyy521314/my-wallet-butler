@@ -18,8 +18,16 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="category.name" label="分类" />
-        <el-table-column prop="account.name" label="账户" />
+        <el-table-column label="分类">
+          <template #default="scope">
+            {{ getCategoryName(scope.row.category_id) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="账户">
+          <template #default="scope">
+            {{ getAccountName(scope.row.account_id) }}
+          </template>
+        </el-table-column>
         <el-table-column prop="date" label="日期" :formatter="dateFormatter" />
         <el-table-column label="操作" width="200">
           <template #default="scope">
@@ -178,6 +186,20 @@ const getTypeText = (type: string) => {
   }
 }
 
+// 根据 ID 获取分类名称
+const getCategoryName = (categoryId: number | undefined) => {
+  if (!categoryId) return '-'
+  const cat = categories.value.find((c: any) => c.id === categoryId)
+  return cat?.name || '-'
+}
+
+// 根据 ID 获取账户名称
+const getAccountName = (accountId: number | undefined) => {
+  if (!accountId) return '-'
+  const acc = accounts.value.find((a: any) => a.id === accountId)
+  return acc?.name || '-'
+}
+
 // 金额格式化函数
 const amountFormatter = (row: any, column: any, cellValue: any) => {
   const amount = parseFloat(cellValue)
@@ -200,7 +222,7 @@ const loadTransactions = async () => {
   try {
     loading.value = true
     const response = await getTransactions()
-    transactions.value = response.data.data?.items || []
+    transactions.value = response.data?.items || []
   } catch (error) {
     console.error('Failed to load transactions:', error)
     ElMessage.error('加载交易数据失败')
@@ -213,7 +235,7 @@ const loadTransactions = async () => {
 const loadCategories = async () => {
   try {
     const response = await getCategories()
-    categories.value = response.data.data?.items || []
+    categories.value = response.data?.items || []
   } catch (error) {
     console.error('Failed to load categories:', error)
     ElMessage.error('加载分类数据失败')
@@ -224,7 +246,7 @@ const loadCategories = async () => {
 const loadAccounts = async () => {
   try {
     const response = await getAccounts()
-    accounts.value = response.data.data?.items || []
+    accounts.value = response.data?.items || []
   } catch (error) {
     console.error('Failed to load accounts:', error)
     ElMessage.error('加载账户数据失败')
