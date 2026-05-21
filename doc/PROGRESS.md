@@ -1,6 +1,6 @@
 # my-wallet-butler 开发进度
 
-> 最后更新：2026-05-09
+> 最后更新：2026-05-21
 
 ---
 
@@ -86,6 +86,49 @@
   - [x] Backup.vue 独立页面（上传恢复 + 备份管理）
 - **完成时间：** 2026-05-09
 - **提交记录：** `phase5-final`
+
+---
+
+## 2026-05-21 - 前端 UI/UX 优化与仪表盘 API
+
+### 新增功能
+- [x] **仪表盘 API** (`/api/v1/dashboard/*`)
+  - [x] GET /summary - 财务概览（总资产、月收入、月支出、余额）
+  - [x] GET /recent-transactions - 最近交易记录
+  - [x] GET /account-balances - 账户余额列表
+  - [x] GET /budget-overview - 预算执行概览
+- [x] **前端仪表盘** (Dashboard.vue)
+  - [x] 从 API 获取实时数据，替换硬编码 mock 值
+  - [x] 使用 Promise.all 并行加载多个接口
+  - [x] 财务概览卡片（总资产、月收入、月支出、余额）
+  - [x] 最近交易列表
+  - [x] 账户余额列表
+  - [x] 预算执行进度条
+
+### Bug 修复
+- [x] **登录问题修复**
+  - [x] auth.ts 改用 URLSearchParams 发送表单数据（application/x-www-form-urlencoded）
+  - [x] user.ts login() 增加防御性响应解析，支持多种响应结构
+  - [x] Login.vue 增加错误信息显示，展示后端验证错误
+- [x] **仪表盘 500 错误修复**
+  - [x] 修复 budget-overview Decimal/float 除法类型错误
+  - [x] 修复 SQLAlchemy 异步延迟加载问题（joinedload 预加载 category）
+- [x] **前端展示问题修复**
+  - [x] 账户管理页面：账户类型显示英文 → 中文映射（cash→现金、bank→银行储蓄卡等）
+  - [x] 交易记录页面：分类列和账户列改为按 ID 匹配显示名称
+  - [x] 预算管理页面：分类列改为按 category_id 匹配显示名称
+
+### 部署更新
+- [x] 后端代码修改后重新构建容器（docker-compose up -d --build backend）
+- [x] 前端代码修改后重新构建并重启容器（npm run build + docker restart wallet_butler_frontend_new）
+- [x] 新版前端部署在端口 81（wallet_butler_frontend_new），旧版在端口 80
+
+### 文档更新
+- [x] 更新 PROGRESS.md（2026-05-21）
+- [x] 更新 memory/2026-05-21.md（会话总结）
+
+**完成时间：** 2026-05-21
+**提交记录：** `eb5b0eb4`
 
 ---
 
