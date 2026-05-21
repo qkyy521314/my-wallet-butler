@@ -89,7 +89,7 @@
 
             <div class="form-options">
               <el-checkbox v-model="rememberMe">记住我</el-checkbox>
-              <a href="#" class="forgot-link">忘记密码？</a>
+              <a href="javascript:void(0)" class="forgot-link" @click="showForgotPassword">忘记密码？</a>
             </div>
 
             <el-form-item>
@@ -120,7 +120,7 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store/modules/user'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { Wallet, DataAnalysis, Lock, User } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -145,6 +145,14 @@ const rules = {
 }
 
 const formRef = ref()
+
+const showForgotPassword = () => {
+  ElMessageBox.alert(
+    '请联系管理员重置密码。管理员可在"用户管理"页面中为您重置密码。',
+    '忘记密码',
+    { confirmButtonText: '我知道了', type: 'info' }
+  )
+}
 
 const handleLogin = async () => {
   if (!formRef.value) return

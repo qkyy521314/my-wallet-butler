@@ -66,6 +66,14 @@
           <el-icon><DocumentCopy /></el-icon>
           <template #title>数据备份</template>
         </el-menu-item>
+
+        <template v-if="isAdmin">
+          <div class="menu-section-title">系统</div>
+          <el-menu-item index="/admin/users" class="menu-item">
+            <el-icon><Setting /></el-icon>
+            <template #title>用户管理</template>
+          </el-menu-item>
+        </template>
       </el-menu>
     </nav>
 
@@ -78,6 +86,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useUserStore } from '@/store/modules/user'
 import {
   House,
   Wallet,
@@ -86,10 +95,16 @@ import {
   Money,
   PieChart,
   Upload,
-  DocumentCopy
+  DocumentCopy,
+  Setting
 } from '@element-plus/icons-vue'
 
 const route = useRoute()
+const userStore = useUserStore()
+
+const isAdmin = computed(() => {
+  return userStore.user?.username === 'admin'
+})
 
 const activeMenu = computed(() => {
   const { path } = route
@@ -101,6 +116,7 @@ const activeMenu = computed(() => {
   if (path.startsWith('/reports')) return '/reports'
   if (path.startsWith('/import')) return '/import'
   if (path.startsWith('/backup')) return '/backup'
+  if (path.startsWith('/admin/users')) return '/admin/users'
   return '/dashboard'
 })
 </script>
@@ -227,7 +243,6 @@ const activeMenu = computed(() => {
   font-weight: 500;
 }
 
-// Custom scrollbar for sidebar
 .sidebar-nav::-webkit-scrollbar {
   width: 4px;
 }
