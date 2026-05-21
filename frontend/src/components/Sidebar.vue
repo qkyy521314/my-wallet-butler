@@ -1,51 +1,77 @@
 <template>
   <div class="sidebar-container">
-    <el-menu
-      :default-active="activeMenu"
-      class="el-menu-vertical"
-      :collapse="false"
-      router
-    >
-      <el-menu-item index="/dashboard">
-        <el-icon><House /></el-icon>
-        <span>仪表盘</span>
-      </el-menu-item>
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="white" fill-opacity="0.15"/>
+            <path d="M8 12C8 10.8954 8.89543 10 10 10H22C23.1046 10 24 10.8954 24 12V20C24 21.1046 23.1046 22 22 22H10C8.89543 22 8 21.1046 8 20V12Z" stroke="white" stroke-width="2"/>
+            <path d="M12 15H20M12 18H17" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="logo-text">钱包管家</span>
+      </div>
+    </div>
 
-      <el-menu-item index="/accounts">
-        <el-icon><Wallet /></el-icon>
-        <span>账户管理</span>
-      </el-menu-item>
+    <nav class="sidebar-nav">
+      <el-menu
+        :default-active="activeMenu"
+        class="sidebar-menu"
+        :collapse="false"
+        router
+        background-color="transparent"
+        text-color="rgba(255, 255, 255, 0.7)"
+        active-text-color="#ffffff"
+        :default-openeds="['dashboard']"
+      >
+        <div class="menu-section-title">概览</div>
+        <el-menu-item index="/dashboard" class="menu-item">
+          <el-icon><House /></el-icon>
+          <template #title>仪表盘</template>
+        </el-menu-item>
 
-      <el-menu-item index="/categories">
-        <el-icon><FolderOpened /></el-icon>
-        <span>分类管理</span>
-      </el-menu-item>
+        <div class="menu-section-title">管理</div>
+        <el-menu-item index="/accounts" class="menu-item">
+          <el-icon><Wallet /></el-icon>
+          <template #title>账户管理</template>
+        </el-menu-item>
 
-      <el-menu-item index="/transactions">
-        <el-icon><Tickets /></el-icon>
-        <span>交易记录</span>
-      </el-menu-item>
+        <el-menu-item index="/categories" class="menu-item">
+          <el-icon><FolderOpened /></el-icon>
+          <template #title>分类管理</template>
+        </el-menu-item>
 
-      <el-menu-item index="/budgets">
-        <el-icon><Money /></el-icon>
-        <span>预算管理</span>
-      </el-menu-item>
+        <el-menu-item index="/transactions" class="menu-item">
+          <el-icon><Tickets /></el-icon>
+          <template #title>交易记录</template>
+        </el-menu-item>
 
-      <el-menu-item index="/reports">
-        <el-icon><PieChart /></el-icon>
-        <span>报表分析</span>
-      </el-menu-item>
+        <el-menu-item index="/budgets" class="menu-item">
+          <el-icon><Money /></el-icon>
+          <template #title>预算管理</template>
+        </el-menu-item>
 
-      <el-menu-item index="/import">
-        <el-icon><Upload /></el-icon>
-        <span>批量导入</span>
-      </el-menu-item>
+        <div class="menu-section-title">工具</div>
+        <el-menu-item index="/reports" class="menu-item">
+          <el-icon><PieChart /></el-icon>
+          <template #title>报表分析</template>
+        </el-menu-item>
 
-      <el-menu-item index="/backup">
-        <el-icon><DocumentCopy /></el-icon>
-        <span>数据备份</span>
-      </el-menu-item>
-    </el-menu>
+        <el-menu-item index="/import" class="menu-item">
+          <el-icon><Upload /></el-icon>
+          <template #title>批量导入</template>
+        </el-menu-item>
+
+        <el-menu-item index="/backup" class="menu-item">
+          <el-icon><DocumentCopy /></el-icon>
+          <template #title>数据备份</template>
+        </el-menu-item>
+      </el-menu>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="version-tag">v1.0.0</div>
+    </div>
   </div>
 </template>
 
@@ -67,7 +93,6 @@ const route = useRoute()
 
 const activeMenu = computed(() => {
   const { path } = route
-  // 匹配当前激活的菜单项
   if (path.startsWith('/dashboard')) return '/dashboard'
   if (path.startsWith('/accounts')) return '/accounts'
   if (path.startsWith('/categories')) return '/categories'
@@ -80,34 +105,135 @@ const activeMenu = computed(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '@/styles/variables.scss';
+
 .sidebar-container {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
-.el-menu-vertical:not(.el-menu--collapse) {
-  width: 200px;
-  height: 100%;
+.sidebar-header {
+  padding: $space-lg;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: $space-md;
+}
+
+.logo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-text {
+  font-family: $font-display;
+  font-size: $text-xl;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.02em;
+}
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: $space-md 0;
+}
+
+.sidebar-menu {
   border-right: none;
-  background-color: #545c64;
+  background: transparent;
+
+  &:not(.el-menu--collapse) {
+    width: 100%;
+  }
 }
 
-/* 菜单项样式 */
+.menu-section-title {
+  padding: $space-lg $space-lg $space-sm;
+  font-size: $text-xs;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: $space-sm;
+}
+
 :deep(.el-menu-item) {
-  color: #fff;
+  height: 48px;
+  line-height: 48px;
+  margin: 4px 12px;
+  border-radius: $radius-md;
+  transition: all $transition-base;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 0;
+    background: white;
+    border-radius: 0 2px 2px 0;
+    transition: height $transition-base;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+
+    .el-icon {
+      transform: scale(1.1);
+    }
+  }
+
+  &.is-active {
+    background: rgba(255, 255, 255, 0.15) !important;
+
+    &::before {
+      height: 24px;
+    }
+  }
+
+  .el-icon {
+    font-size: 18px;
+    transition: transform $transition-base;
+  }
 }
 
-:deep(.el-menu-item:hover) {
-  background-color: rgba(255, 255, 255, 0.1);
+:deep(.el-menu-item span) {
+  font-weight: 500;
+  font-size: $text-base;
 }
 
-:deep(.el-menu-item.is-active) {
-  background-color: #409EFF;
+.sidebar-footer {
+  padding: $space-lg;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-:deep(.el-icon) {
-  color: #fff;
+.version-tag {
+  text-align: center;
+  font-size: $text-xs;
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 500;
+}
+
+// Custom scrollbar for sidebar
+.sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
 }
 </style>

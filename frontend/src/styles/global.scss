@@ -1,71 +1,284 @@
-// 全局样式
+// ========================================
+// Global Styles - Financial Zen
+// ========================================
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body {
-  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', Arial, sans-serif;
+html {
   font-size: 14px;
-  line-height: 1.5;
-  color: $text-color-regular;
-  background-color: $main-bg-color;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: $font-family;
+  font-size: $text-base;
+  line-height: 1.6;
+  color: $text-primary;
+  background-color: $bg-main;
+  min-height: 100vh;
+}
+
+#app {
+  min-height: 100vh;
 }
 
 a {
   text-decoration: none;
   color: $primary-color;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $primary-dark;
+  }
 }
 
-a:hover {
-  color: lighten($primary-color, 10%);
+// Typography Enhancements
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-display;
+  font-weight: 600;
+  color: $text-primary;
+  line-height: 1.3;
 }
 
-// Element Plus 自定义样式
+h1 { font-size: $text-4xl; }
+h2 { font-size: $text-3xl; }
+h3 { font-size: $text-2xl; }
+h4 { font-size: $text-xl; }
+h5 { font-size: $text-lg; }
+h6 { font-size: $text-base; }
+
+// Custom Scrollbar
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $gray-300;
+  border-radius: $radius-full;
+
+  &:hover {
+    background: $gray-400;
+  }
+}
+
+// Element Plus Customizations
 .el-card {
-  margin-bottom: 20px;
+  border: 1px solid $border-color;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  transition: box-shadow $transition-base, transform $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-card-hover;
+  }
+
+  .el-card__header {
+    padding: $space-md $space-lg;
+    border-bottom: 1px solid $border-light;
+    font-family: $font-display;
+    font-weight: 600;
+  }
+
+  .el-card__body {
+    padding: $space-lg;
+  }
+}
+
+.el-button--primary {
+  background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
+  border: none;
+  border-radius: $radius-md;
+  font-weight: 500;
+  transition: all $transition-base;
+
+  &:hover {
+    background: linear-gradient(135deg, $primary-light 0%, $primary-color 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($primary-color, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.el-input__wrapper {
+  border-radius: $radius-md;
+  box-shadow: 0 0 0 1px $border-color inset;
+  transition: all $transition-fast;
+
+  &:hover {
+    box-shadow: 0 0 0 1px $gray-400 inset;
+  }
+
+  &.is-focus {
+    box-shadow: 0 0 0 2px rgba($primary-color, 0.2), 0 0 0 1px $primary-color inset;
+  }
+}
+
+.el-select .el-input__wrapper {
+  border-radius: $radius-md;
 }
 
 .el-table {
-  margin-top: 20px;
+  border-radius: $radius-lg;
+  overflow: hidden;
+
+  th.el-table__cell {
+    background: $gray-50;
+    font-family: $font-display;
+    font-weight: 600;
+    color: $text-secondary;
+    font-size: $text-sm;
+  }
+
+  .el-table__row {
+    transition: background-color $transition-fast;
+
+    &:hover > td.el-table__cell {
+      background-color: rgba($primary-color, 0.03) !important;
+    }
+  }
 }
 
-// 响应式布局
+.el-dialog {
+  border-radius: $radius-xl;
+  overflow: hidden;
+
+  .el-dialog__header {
+    padding: $space-lg;
+    border-bottom: 1px solid $border-light;
+  }
+
+  .el-dialog__body {
+    padding: $space-lg;
+  }
+
+  .el-dialog__footer {
+    padding: $space-md $space-lg;
+    border-top: 1px solid $border-light;
+  }
+}
+
+.el-tag {
+  border-radius: $radius-full;
+  font-weight: 500;
+  border: none;
+}
+
+.el-tag--success {
+  background-color: rgba($success-color, 0.1);
+  color: $success-color;
+}
+
+.el-tag--danger {
+  background-color: rgba($danger-color, 0.1);
+  color: $danger-color;
+}
+
+.el-tag--warning {
+  background-color: rgba($warning-color, 0.1);
+  color: $warning-color;
+}
+
+.el-tag--info {
+  background-color: rgba($info-color, 0.1);
+  color: $info-color;
+}
+
+// Utility Classes
+.text-primary { color: $text-primary; }
+.text-secondary { color: $text-secondary; }
+.text-tertiary { color: $text-tertiary; }
+.text-muted { color: $text-muted; }
+.text-success { color: $success-color; }
+.text-danger { color: $danger-color; }
+.text-warning { color: $warning-color; }
+.text-info { color: $info-color; }
+
+.bg-primary { background-color: $primary-color; }
+.bg-success { background-color: $success-color; }
+.bg-warning { background-color: $warning-color; }
+.bg-danger { background-color: $danger-color; }
+
+.font-display { font-family: $font-display; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+// Animation Utilities
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.4s ease forwards;
+}
+
+// Responsive
 @media (max-width: 768px) {
-  .container {
-    padding: 10px;
+  .el-card .el-card__body {
+    padding: $space-md;
   }
 
-  .el-col-xs-24 {
-    width: 100%;
-    display: block;
+  .el-dialog {
+    width: 90% !important;
+    margin: $space-md auto !important;
   }
 }
 
-// 工具类
-.text-center {
-  text-align: center;
-}
-
-.text-left {
-  text-align: left;
-}
-
-.text-right {
-  text-align: right;
-}
-
-.pull-left {
-  float: left;
-}
-
-.pull-right {
-  float: right;
-}
-
-.clearfix::after {
-  display: block;
-  clear: both;
-  content: "";
+// Stagger animations for lists
+@for $i from 1 through 10 {
+  .stagger-#{$i} {
+    animation-delay: #{$i * 0.05}s;
+  }
 }

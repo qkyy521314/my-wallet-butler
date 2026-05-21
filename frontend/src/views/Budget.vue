@@ -322,23 +322,56 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '@/styles/variables.scss';
+
 .budget-page {
-  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
 
-.card-header h3 {
-  margin: 0;
+  h3 {
+    margin: 0;
+    font-family: $font-display;
+    font-weight: 600;
+    color: $text-primary;
+  }
 }
 
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
+  gap: $space-md;
+}
+
+:deep(.el-card) {
+  border-radius: $radius-lg;
+}
+
+:deep(.el-card__header) {
+  padding: $space-md $space-lg;
+  border-bottom: 1px solid $border-light;
+}
+
+:deep(.el-table) {
+  border-radius: $radius-lg;
+  overflow: hidden;
+
+  th.el-table__cell {
+    background: $gray-50 !important;
+    font-family: $font-display;
+    font-weight: 600;
+    color: $text-secondary;
+    font-size: $text-sm;
+  }
 }
 </style>
